@@ -84,8 +84,10 @@ PUMP1 PUMP1 PUMP1dn POWER 0.1
  Statistic          	None
 
 [REPORT]
- Status             	No
- Summary            	No
+ Status             	Yes
+ Summary            	Yes
+ Nodes			All
+ Links			All
  Page               	0
 
 [OPTIONS]

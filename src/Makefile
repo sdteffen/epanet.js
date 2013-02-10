@@ -11,7 +11,8 @@ epanet.js: $(epanet_sources) $(epanet_headers)
 	emcc -O1 $(epanet_sources) -o epanet.js --embed-file simple.inp 
 
 epanet.html: $(epanet_sources) $(epanet_headers)
-	emcc -O1 $(epanet_sources) -o epanet.html --embed-file simple.inp
+	emcc -O1 $(epanet_sources) -o epanet.html --embed-file simple.inp \
+	--pre-js pre.js
 
 clean:
 	rm epanet.js	
