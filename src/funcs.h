@@ -41,6 +41,7 @@ int     findnode(char *);                 /* Finds node's index from ID */
 int     findlink(char *);                 /* Finds link's index from ID */
 char*   geterrmsg(int);                   /* Gets text of error message */
 void    errmsg(int);                      /* Reports program error      */
+extern 
 void    writecon(char *);                 /* Writes text to console     */
 void    writewin(char *);                 /* Passes text to calling app */
 

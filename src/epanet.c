@@ -3084,22 +3084,6 @@ void  errmsg(int errcode)
    }
 }
 
-
-void  writecon(char *s)
-/*----------------------------------------------------------------
-**  Input:   text string                                         
-**  Output:  none                                                
-**  Purpose: writes string of characters to console              
-**----------------------------------------------------------------
-*/
-{
-#ifdef CLE                                                                     //(2.00.11 - LR)
-   fprintf(stdout,s);
-   fflush(stdout);
-#endif
-}
-
-
 void writewin(char *s)
 /*----------------------------------------------------------------
 **  Input:   text string                                         
