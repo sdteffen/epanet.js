@@ -102,11 +102,6 @@ PUMP1 PUMP1 PUMP1dn POWER 0.1
           var element = document.getElementById('output');
           element.value = ''; // clear browser cache
           return function(text) {
-            // These replacements are necessary if you render to raw HTML
-            //text = text.replace(/&/g, "&amp;");
-            //text = text.replace(/</g, "&lt;");
-            //text = text.replace(/>/g, "&gt;");
-            //text = text.replace('\n', '<br>', 'g');
             element.value += text + "\n";
             element.scrollTop = 99999; // focus on bottom
           };
