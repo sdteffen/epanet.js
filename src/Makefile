@@ -19,3 +19,4 @@ epanet.html: $(epanet_sources) $(epanet_headers) $(epanet_js)
 clean:
 	rm -f epanet.js
 	rm -f epanet.html
+
