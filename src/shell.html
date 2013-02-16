@@ -106,6 +106,7 @@ function handleFileSelect(evt) {
   reader.onload = (function(theFile) {
             return function(e) {
               document.getElementById('input').value = e.target.result;
+	      runButton();
             };
           })(f);
 
