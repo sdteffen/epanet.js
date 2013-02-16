@@ -14,6 +14,7 @@
   <body>
     <h1>epanet.js</h1>
 	<h2>Input</h2>
+	<input type="file" id="file" style="display: none"/>
 	<textarea id="input" class="emscripten">
 [TITLE]
 epanet.js sample
@@ -94,6 +95,24 @@ PUMP1 PUMP1 PUMP1dn POWER 0.1
     <textarea class="emscripten" id="output" rows="8" readonly></textarea>
     <div id="status">epanet.js...</div>
     <script type='text/javascript'>
+if(window.File && window.FileReader && window.FileList)
+  document.getElementById('file').style.display = 'block';
+function handleFileSelect(evt) {
+  if(!evt.target || !evt.target.files || !evt.target.files.length || 0 == evt.target.files.length)
+	return;
+	
+  var f = evt.target.files[0],
+    reader = new FileReader();
+  reader.onload = (function(theFile) {
+            return function(e) {
+              document.getElementById('input').value = e.target.result;
+            };
+          })(f);
+
+  reader.readAsText(f);
+}
+document.getElementById('file').addEventListener('change', handleFileSelect, false);
+
       // connect to canvas
       var Module = {
         preRun: [],
