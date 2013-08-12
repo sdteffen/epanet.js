@@ -14,10 +14,10 @@ R1 25
 [TANKS] ; created by GHydraulics
 
 [PIPES] ; created by GHydraulics
-P4 J1 G 720 100 0.1 0 OPEN 
-P2 J0 PUMP1 5 100 0.1 0 OPEN 
-P3 PUMP1dn J1 5 100 0.1 0 OPEN 
-P1 R1 J0 5 100 0.1 0 OPEN 
+P4 J1 G 740.791 100 0.1 0 OPEN 
+P2 J0 PUMP1 2.208 100 0.1 0 OPEN 
+P3 PUMP1dn J1 2.68 100 0.1 0 OPEN 
+P1 R1 J0 1.052 100 0.1 0 OPEN 
 
 [PUMPS] ; created by GHydraulics
 PUMP1 PUMP1 PUMP1dn POWER 0.1 
@@ -84,10 +84,8 @@ PUMP1 PUMP1 PUMP1dn POWER 0.1
  Statistic          	None
 
 [REPORT]
- Status             	Yes
- Summary            	Yes
- Nodes			All
- Links			All
+ Status             	No
+ Summary            	No
  Page               	0
 
 [OPTIONS]
@@ -125,10 +123,6 @@ P2 10.1661784174 51.8015397878
 [LABELS]
 ;X-Coord           Y-Coord          Label & Anchor Node
 
-[BACKDROP] ; created by GHydraulics
-DIMENSIONS 10.1661502734 51.7997067163 10.1763416084 51.8015397878
-UNITS              None
-FILE
-OFFSET             0.00                0.00
+[BACKDROP]
 
 [END]

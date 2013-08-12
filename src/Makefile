@@ -12,7 +12,7 @@ d3epanet_js = pre.js library.js d3shell.html
 all: epanet.html
 
 epanet.js: $(epanet_sources) $(epanet_headers)
-	emcc -O1 $(epanet_sources) -o epanet.js --embed-file simple.inp --embed-file gittelde.inp
+	emcc -O1 $(epanet_sources) -o epanet.js --embed-file simple.inp
 
 epanet.html: $(epanet_sources) $(epanet_headers) $(epanet_js)
 	emcc -O1 $(epanet_sources) -o epanet.html \

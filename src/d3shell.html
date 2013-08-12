@@ -1,47 +1,79 @@
 <!doctype html>
+<!DOCTYPE html>
 <html lang="en-us">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>epanet.js</title>
-    <style>
-      .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
-      canvas.emscripten { border: 1px solid black; }
-      textarea.emscripten { font-family: monospace; width: 44em; height: 20em;}
-      div.emscripten { text-align: center; }
-    </style>
+    <link rel="stylesheet" href="css/d3epanet.css" />
   </head>
   <body>
     <h1>epanet.js</h1>
+    <div id="col1">
 	<h2>Input</h2>
 	<input type="file" id="file" style="display: none"/>
 	<textarea id="input" class="emscripten">
 [TITLE]
-epanet.js sample
 
-[JUNCTIONS]
+
+[JUNCTIONS] ; created by GHydraulics
 PUMP1 25 0 
 PUMP1dn 25 0 
 J1 25   
 G 0 351  
 J0 25   
 
-[RESERVOIRS]
+[RESERVOIRS] ; created by GHydraulics
 R1 25  
 
-[PIPES]
-P4 J1 G 720 100 0.1 0 OPEN 
-P2 J0 PUMP1 5 100 0.1 0 OPEN 
-P3 PUMP1dn J1 5 100 0.1 0 OPEN 
-P1 R1 J0 5 100 0.1 0 OPEN 
+[TANKS] ; created by GHydraulics
 
-[PUMPS]
+[PIPES] ; created by GHydraulics
+P4 J1 G 740.791 100 0.1 0 OPEN 
+P2 J0 PUMP1 2.208 100 0.1 0 OPEN 
+P3 PUMP1dn J1 2.68 100 0.1 0 OPEN 
+P1 R1 J0 1.052 100 0.1 0 OPEN 
+
+[PUMPS] ; created by GHydraulics
 PUMP1 PUMP1 PUMP1dn POWER 0.1 
+
+[VALVES] ; created by GHydraulics
+
+[TAGS]
+
+[DEMANDS]
+;Junction        	Demand      	Pattern         	Category
+
+[STATUS]
+;ID              	Status/Setting
+
+[PATTERNS]
+;ID              	Multipliers
+
+[CURVES]
+;ID              	X-Value     	Y-Value
+
+[CONTROLS]
+
+[RULES]
 
 [ENERGY]
  Global Efficiency  	75
  Global Price       	0
  Demand Charge      	0
+
+[EMITTERS]
+;Junction        	Coefficient
+
+[QUALITY]
+;Node            	InitQual
+
+[SOURCES]
+;Node            	Type        	Quality     	Pattern
+
+[REACTIONS]
+;Type     	Pipe/Tank       	Coefficient
+
 
 [REACTIONS]
  Order Bulk            	1
@@ -51,6 +83,9 @@ PUMP1 PUMP1 PUMP1dn POWER 0.1
  Global Wall           	0
  Limiting Potential    	0
  Roughness Correlation 	0
+
+[MIXING]
+;Tank            	Model
 
 [TIMES]
  Duration           	0
@@ -64,10 +99,8 @@ PUMP1 PUMP1 PUMP1dn POWER 0.1
  Statistic          	None
 
 [REPORT]
- Status             	Yes
- Summary            	Yes
- Nodes			All
- Links			All
+ Status             	No
+ Summary            	No
  Page               	0
 
 [OPTIONS]
@@ -88,13 +121,37 @@ PUMP1 PUMP1 PUMP1dn POWER 0.1
  Diffusivity        	1
  Tolerance          	0.01
 
+[COORDINATES] ; created by GHydraulics
+PUMP1 10.1661784174 51.8015397878
+PUMP1dn 10.1661922403 51.8015313179
+J1 10.1662060632 51.8015228479
+G 10.176376908 51.7997067163
+J0 10.1661583145 51.8015552353
+R1 10.1661502734 51.8015632765
+[VERTICES] ; created by GHydraulics
+P4 10.1665175862 51.8013427744
+P4 10.1709055563 51.8008257206
+P4 10.1721213314 51.8005741809
+P4 10.1740358279 51.8004623855
+P4 10.1763416084 51.7997357153
+P2 10.1661784174 51.8015397878
+[LABELS]
+;X-Coord           Y-Coord          Label & Anchor Node
+
+[BACKDROP]
+
 [END]
-    </textarea>
-    <button type="button" onclick="runButton()" class="emscripten">Run</button>
-	<h2>Output</h2>
-    <textarea class="emscripten" id="output" rows="8" readonly></textarea>
-    <div id="status">epanet.js...</div>
-    <script type='text/javascript'>
+
+        </textarea>
+        <button type="button" onclick="runButton()" class="emscripten">Run</button>
+            <h2>Output</h2>
+        <textarea class="emscripten" id="output" rows="8" readonly></textarea>
+        <div id="status">epanet.js...</div>
+    </div>
+    <div id="col2"></div>
+  </body>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+      <script type='text/javascript'>
 if(window.File && window.FileReader && window.FileList)
   document.getElementById('file').style.display = 'block';
 function handleFileSelect(evt) {
@@ -144,11 +201,76 @@ document.getElementById('file').addEventListener('change', handleFileSelect, fal
         }
       };
       Module.setStatus('Preparing...');
-    </script>
-    <script type='text/javascript'>
-
+    
       {{{ SCRIPT_CODE }}}
 
+
+// d3.js rendering
+var width  = 800,
+    height = 500,
+    colors = d3.scale.category10();
+
+var svg = d3.select('#col2')
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height)
+  .attr('viewBox', '10.16 51.79 0.05 0.05')
+  .attr('style', 'background: yellow;');
+
+var nodes = [],
+  lastNodeId = 0,
+  links = [],
+  model = parseINP(document.getElementById('input').value),
+  nodemap = {},
+  nodesections = ['JUNCTIONS', 'RESERVOIRS', 'TANKS'],
+  linksections = ['PIPES', 'VALVES', 'PUMPS'];
+
+function node2node(sectionnodes)
+{
+    for(var node in sectionnodes)
+    {
+        nodemap[node] = lastNodeId;
+        nodes[lastNodeId++] = {id: node, reflexive: false}
+    }
+}
+
+function link2link(sectionlinks)
+{
+    console.log(sectionlinks);
+    for(var pipe in sectionlinks)
+    {
+        var source = nodes[nodemap[sectionlinks[pipe].replace(/ *([^ ]+) .*/, '$1')]],
+            target = nodes[nodemap[sectionlinks[pipe].replace(/ *[^ ]+ +([^ ]+) .*/, '$1')]];
+        console.log(sectionlinks[pipe]);
+        links[links.length] = {source: source, target: target, left: false, right: true};
+    }
+}
+
+for(var s in nodesections)
+    {
+        var section = nodesections[s]
+        if(model[section])
+            node2node(model[section]);
+    }   
+    
+for(var s in linksections)
+    {
+        var section = linksections[s];
+        console.log(section);
+        if(model[section])
+            link2link(model[section]);
+    }
+    
+for(var c in model.COORDINATES)
+    {
+        var coordinate = model.COORDINATES[c],
+                cx = coordinate.replace(/ *([^ ]+) .*$/, '$1'),
+                cy = coordinate.replace(/^ *[^ ]+ +/, '');
+        console.log(coordinate+':'+cx+','+cy);
+        svg.append('circle')
+                .attr('cx',cx )
+                .attr('cy',cy)
+                .attr('r', '0.001');
+    }
     </script>
-  </body>
 </html>
