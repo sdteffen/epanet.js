@@ -188,7 +188,7 @@ int  readdata()
       /* Check if max. length exceeded */
          if (strlen(line) >= MAXLINE)
          {
-            sprintf(Msg,ERR214);
+            sprintf(Msg,ERR214,*SectTxt);
             writeline(Msg);
             writeline(line);
             errsum++;

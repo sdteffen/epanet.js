@@ -707,7 +707,7 @@ void  writeline(char *s)
       if (LineNum == (long)PageSize)
       {
          PageNum++;
-         if (fprintf(RptFile,FMT82,PageNum,Title[0]) == EOF)
+         if (fprintf(RptFile,FMT82,(int)PageNum,Title[0]) == EOF)
             Fprinterr = TRUE;
          LineNum = 3;
       }
