@@ -1,22 +1,29 @@
-var Module = {
-    arguments: ['/input.inp', '/report.txt'],
-    preRun: function() {
+var preRun = function() {
+    FS.quit();
+    FS.staticInit();
+    FS.ignorePermissions = true;
+    try
+    {
         FS.createDataFile('/', 'input.inp', document.getElementById('input').value, true, true);
-    },
-    postRun: function() {
-        var o = document.getElementById('output'),
-                t = Module.intArrayToString(FS.findObject('/report.txt').contents)
-        t = t.replace(/&/g, "&amp;");
-        t = t.replace(/</g, "&lt;");
-        t = t.replace(/>/g, "&gt;");
-        o.value = t;
+    } catch (e) {
+        console.log('/input.inp creation failed');
     }
+},
+        postRun = function() {
+    var o = document.getElementById('output'),
+            t = Module.intArrayToString(FS.findObject('/report.txt').contents)
+    t = t.replace(/&/g, "&amp;");
+    t = t.replace(/</g, "&lt;");
+    t = t.replace(/>/g, "&gt;");
+    o.value = t;
+},
+        Module = {
+    arguments: ['/input.inp', '/report.txt', '/report.bin'],
+    preRun: preRun,
+    postRun: postRun
 };
 
 runButton = function() {
-    FS.unlink('/input.inp');
-    FS.unlink('/report.txt');
-    FS.createDataFile('/', 'input.inp', document.getElementById('input').value, true, true);
     Module.run();
     var o = document.getElementById('output'),
             t = Module.intArrayToString(FS.findObject('/report.txt').contents)
@@ -44,7 +51,7 @@ function parseINP(inp) {
             section = s[1];
         } else if (regex.value.test(line)) {
             var v = line.match(regex.value);
-                model[section][v[1]] = v[2];           
+            model[section][v[1]] = v[2];
         }
         ;
     });

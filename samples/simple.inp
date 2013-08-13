@@ -84,9 +84,11 @@ PUMP1 PUMP1 PUMP1dn POWER 0.1
  Statistic          	None
 
 [REPORT]
- Status             	No
- Summary            	No
+ Status             	Yes
+ Summary            	Yes
  Page               	0
+ Nodes                  All
+ Links                  All
 
 [OPTIONS]
  Units              	CMD
