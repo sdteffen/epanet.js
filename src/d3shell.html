@@ -1,4 +1,3 @@
-<!doctype html>
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
@@ -6,6 +5,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>epanet.js</title>
     <link rel="stylesheet" href="css/d3epanet.css" />
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="js/d3epanet.js"></script>
   </head>
   <body>
     <h1>epanet.js</h1>
@@ -152,7 +153,6 @@ P2 10.1661784174 51.8015397878
     </div>
     <div id="col2"></div>
   </body>
-  <script src="http://d3js.org/d3.v3.min.js"></script>
       <script type='text/javascript'>
 if(window.File && window.FileReader && window.FileList)
   document.getElementById('file').style.display = 'block';
@@ -206,73 +206,5 @@ document.getElementById('file').addEventListener('change', handleFileSelect, fal
     
       {{{ SCRIPT_CODE }}}
 
-
-// d3.js rendering
-var width  = 800,
-    height = 500,
-    colors = d3.scale.category10();
-
-var svg = d3.select('#col2')
-  .append('svg')
-  .attr('width', width)
-  .attr('height', height)
-  .attr('viewBox', '10.16 51.79 0.05 0.05')
-  .attr('style', 'background: yellow;');
-
-var nodes = [],
-  lastNodeId = 0,
-  links = [],
-  model = parseINP(document.getElementById('input').value),
-  nodemap = {},
-  nodesections = ['JUNCTIONS', 'RESERVOIRS', 'TANKS'],
-  linksections = ['PIPES', 'VALVES', 'PUMPS'];
-
-function node2node(sectionnodes)
-{
-    for(var node in sectionnodes)
-    {
-        nodemap[node] = lastNodeId;
-        nodes[lastNodeId++] = {id: node, reflexive: false}
-    }
-}
-
-function link2link(sectionlinks)
-{
-    console.log(sectionlinks);
-    for(var pipe in sectionlinks)
-    {
-        var source = nodes[nodemap[sectionlinks[pipe].replace(/ *([^ ]+) .*/, '$1')]],
-            target = nodes[nodemap[sectionlinks[pipe].replace(/ *[^ ]+ +([^ ]+) .*/, '$1')]];
-        console.log(sectionlinks[pipe]);
-        links[links.length] = {source: source, target: target, left: false, right: true};
-    }
-}
-
-for(var s in nodesections)
-    {
-        var section = nodesections[s]
-        if(model[section])
-            node2node(model[section]);
-    }   
-    
-for(var s in linksections)
-    {
-        var section = linksections[s];
-        console.log(section);
-        if(model[section])
-            link2link(model[section]);
-    }
-    
-for(var c in model.COORDINATES)
-    {
-        var coordinate = model.COORDINATES[c],
-                cx = coordinate.replace(/ *([^ ]+) .*$/, '$1'),
-                cy = coordinate.replace(/^ *[^ ]+ +/, '');
-        console.log(coordinate+':'+cx+','+cy);
-        svg.append('circle')
-                .attr('cx',cx )
-                .attr('cy',cy)
-                .attr('r', '0.001');
-    }
     </script>
 </html>

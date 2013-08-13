@@ -8,6 +8,7 @@ var preRun = function() {
     } catch (e) {
         console.log('/input.inp creation failed');
     }
+    rendersvg();
 },
         postRun = function() {
     var o = document.getElementById('output'),
