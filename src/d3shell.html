@@ -1,21 +1,106 @@
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>epanet.js</title>
-    <link rel="stylesheet" href="css/d3epanet.css" />
+  
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script type="text/javascript" src="js/d3epanet.js"></script>
+    
+     <!-- Bootstrap header -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="css/bootstrap.css" rel="stylesheet"/>
+    <link href="css/bootstrap-responsive.css" rel="stylesheet"/>
+    
+    <link rel="stylesheet" href="css/d3epanet.css" />
   </head>
   <body>
-    <h1>epanet.js</h1>
-    <div id="col1">
-	<h2>Input</h2>
-	<input type="file" id="file" style="display: none"/>
-	<textarea id="input" class="emscripten">
-[TITLE]
+      
+      
+    <!-- NAVBAR
+    ================================================== -->
+    <div class="navbar-wrapper">
+      <!-- Wrap the .navbar in .container to center it within the absolutely positioned parent. -->
+      <div class="container">
 
+        <div class="navbar navbar-inverse">
+          <div class="navbar-inner">
+            <!-- Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize. -->
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="#">epanet.js</a>
+            <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
+            <div class="nav-collapse collapse">
+              <ul class="nav">
+                <li class="active"><a href="http://epanet.de/">epanet.de</a></li>
+                <!-- Read about Bootstrap dropdowns at http://twbs.github.com/bootstrap/javascript.html#dropdowns -->
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Samples <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#">simple.inp</a></li>
+                    <li class="divider"></li>
+                    <li class="nav-header">Nav header</li>
+                    <li><a href="#">Separated link</a></li>
+                    <li><a href="#">One more separated link</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div><!--/.nav-collapse -->
+          </div><!-- /.navbar-inner -->
+        </div><!-- /.navbar -->
+
+      </div> <!-- /.container -->
+    </div><!-- /.navbar-wrapper -->
+
+
+
+    <!-- Carousel
+    ================================================== -->
+    <div id="myCarousel" class="carousel slide">
+      <div class="carousel-inner">
+        <div class="item active" id="simple_model">          
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>Simplified model</h1>              
+              <a class="btn btn-large btn-primary" href="javascript:runButton();">Run analysis</a>
+            </div>
+          </div>
+        </div>
+        <div class="item" id="analysis_model">
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>Analysis model</h1>
+              <p class="lead">Overview.</p>
+              <a class="btn btn-large btn-primary" href="javascript:runButton();">Run analysis</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a class="left carousel-control" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+      <a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;</a>
+    </div><!-- /.carousel -->
+
+
+
+    <!-- Marketing messaging and featurettes
+    ================================================== -->
+    <!-- Wrap the rest of the page in another container to center all the content. -->
+
+    <div class="container marketing">
+
+      <!-- Three columns of text below the carousel -->
+      <div class="row">
+        <div class="span8">
+          <img class="img-circle" data-src="holder.js/140x140">
+          <h2>Input</h2>        
+          <p><input class="btn btn-larg" type="file" id="file" style="display: none"/> <a class="btn btn-large" href="#">Save</a></p>
+           <pre id="input">
+[TITLE]
+Simple epanet.js model
 
 [JUNCTIONS] ; created by GHydraulics
 PUMP1 25 0 
@@ -143,17 +228,46 @@ P2 10.1661784174 51.8015397878
 
 [BACKDROP]
 
-[END]
+[END]</pre>
+        </div><!-- /.span8 -->
+        <div class="span8">
+          <img class="img-circle" data-src="holder.js/140x140">
+          <h2>Analysis</h2>          
+          <p><a class="btn" href="#">View details &raquo;</a></p>
+          <pre id="output"></pre>
+        </div><!-- /.span8 -->        
+      </div><!-- /.row -->
 
-        </textarea>
-        <button type="button" onclick="runButton()" class="emscripten">Run</button>
-            <h2>Output</h2>
-        <textarea class="emscripten" id="output" rows="8" readonly></textarea>
+      
+      <!-- FOOTER -->
+      <footer>
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>&copy; 2013 Steffen Macke <a href="mailto:sdteffen@gmail.com">sdteffen@gmail.com</a> &middot; <a href="http://epanet.de/privacypolicy.html.en">Privacy</a> &middot; <a href="http://epanet.de/imprint.html.en">Imprint</a></p>
+      </footer>
+
+    </div><!-- /.container -->
+
+
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+      !function ($) {
+        $(function(){
+          // carousel demo
+          $('#myCarousel').carousel()
+        })
+      }(window.jQuery)
+    </script>
+      
+      
         <div id="status">epanet.js...</div>
-    </div>
-    <div id="col2"></div>
+    
   </body>
-      <script type='text/javascript'>
+  <script type="text/javascript">
 if(window.File && window.FileReader && window.FileList)
   document.getElementById('file').style.display = 'block';
 function handleFileSelect(evt) {
@@ -179,9 +293,9 @@ document.getElementById('file').addEventListener('change', handleFileSelect, fal
         postRun: [],
         print: (function() {
           var element = document.getElementById('output');
-          element.value = ''; // clear browser cache
+          element.innerHTML = ''; // clear browser cache
           return function(text) {
-            element.value += text + "\n";
+            element.innerHTML += text + "\n";
             element.scrollTop = 99999; // focus on bottom
           };
         })(),

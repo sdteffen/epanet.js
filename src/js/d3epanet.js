@@ -19,7 +19,7 @@ function link2link(sectionlinks)
     }
 }
 
-var width = 800,
+var width = window.innerWidth || document.documentElement.clientWidth || d.getElementsByTagName('body')[0].clientWidth,
         height = 500,
         colors = d3.scale.category10(),
         nodemap = {},
@@ -33,16 +33,16 @@ function rendersvg() {
     links=[];
     nodes=[]
     d3.selectAll('svg').remove();
-    var svg = d3.select('#col2')
+    var svg = d3.select('#simple_model')
             .append('svg')
             .attr('width', width)
             .attr('height', height)
             .attr('viewBox', '10.16 51.79 0.05 0.05')
-            .attr('style', 'border: 1px solid black;')
+            .attr('style', 'border: 1px solid red;')
             .attr('id', 'svg');
 
     var 
-            model = parseINP(document.getElementById('input').value),            
+            model = parseINP(d3.select('#input').html()),            
             nodesections = ['JUNCTIONS', 'RESERVOIRS', 'TANKS'],
             linksections = ['PIPES', 'VALVES', 'PUMPS'];
 
@@ -70,7 +70,8 @@ function rendersvg() {
         svg.append('circle')
                 .attr('cx', cx)
                 .attr('cy', cy)
-                .attr('r', '0.001');
+                .attr('r', '0.001')
+                .attr('style', 'fill: white;');
     }
 
 }

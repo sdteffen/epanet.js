@@ -4,19 +4,18 @@ var preRun = function() {
     FS.ignorePermissions = true;
     try
     {
-        FS.createDataFile('/', 'input.inp', document.getElementById('input').value, true, true);
+        FS.createDataFile('/', 'input.inp', $('input').html(), true, true);
     } catch (e) {
         console.log('/input.inp creation failed');
     }
     rendersvg();
 },
         postRun = function() {
-    var o = document.getElementById('output'),
-            t = Module.intArrayToString(FS.findObject('/report.txt').contents)
+    var t = Module.intArrayToString(FS.findObject('/report.txt').contents)
     t = t.replace(/&/g, "&amp;");
     t = t.replace(/</g, "&lt;");
     t = t.replace(/>/g, "&gt;");
-    o.value = t;
+    $('#output').html(t);
 },
         Module = {
     arguments: ['/input.inp', '/report.txt', '/report.bin'],
@@ -26,12 +25,6 @@ var preRun = function() {
 
 runButton = function() {
     Module.run();
-    var o = document.getElementById('output'),
-            t = Module.intArrayToString(FS.findObject('/report.txt').contents)
-    t = t.replace(/&/g, "&amp;");
-    t = t.replace(/</g, "&lt;");
-    t = t.replace(/>/g, "&gt;");
-    o.value = t;
 }
 
 function parseINP(inp) {
