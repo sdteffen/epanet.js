@@ -1,3 +1,11 @@
+function escapeInp(t) {
+    t = t.replace(/&/g, '&amp;');
+    t = t.replace(/</g, '&lt;');
+    t = t.replace(/>/g, '&gt;');
+    t = t.replace(/\n/g, '<br/>');
+    return t;
+}
+
 var preRun = function() {
     FS.quit();
     FS.staticInit();
@@ -6,7 +14,7 @@ var preRun = function() {
     {
         var inp = document.getElementById('inputTextarea').value;
         $('#inputModal').modal('hide');
-        $('#inputPre').html(inp);
+        $('#inputPre').html(escapeInp(inp));
         FS.createDataFile('/', 'input.inp', inp, true, true);
     } catch (e) {
         console.log('/input.inp creation failed');
@@ -19,11 +27,8 @@ var preRun = function() {
         m = s.html(),
         l = (0 > m.indexOf('error') ? '<span class="label label-success">Success</span>' 
             : '<span class="label label-important">Error</span>');
-    s.html(l + m.replace(/^[ \n]*\.\.\. */, ' '));
-    t = t.replace(/&/g, "&amp;");
-    t = t.replace(/</g, "&lt;");
-    t = t.replace(/>/g, "&gt;");
-    $('#output').html(t);    
+    s.html(l + m.replace(/^[ \n]*\.\.\. */, ' '));    
+    $('#output').html(escapeInp(t));    
 },
         Module = {
     arguments: ['/input.inp', '/report.txt', '/report.bin'],
@@ -37,6 +42,6 @@ runButton = function() {
 
 saveButton = function () {
     var inp = $('#inputTextarea').val(),
-        blob = new Blob([inp], {type: "text/plain;charset=utf-8"});
-    saveAs(blob, "epanet.js.inp");
+        blob = new Blob([inp], {type: 'text/plain;charset=utf-8'});
+    saveAs(blob, 'epanet.js.inp');
 }

@@ -201,6 +201,8 @@ text.id {
     
     #inputPre, #output {
         text-align:left;
+        overflow-y: auto;
+        white-space: nowrap;
     }
     
     #inputTextarea {
