@@ -195,8 +195,24 @@ text.id {
     
     input.btn {float:left; height: 30px; font-size: 18px; padding-top: 8px; line-height:20px;}
     
-    #inputPre, #output {text-align:left;}
+    #inputPre, #output {
+        text-align:left;
+    }
+    
+    #inputTextarea {
+        width: 97%;
+        height: 20em;
+    }
 
+    #inputButtons {
+        width: 620px;
+        margin-bottom: 10px;
+    }
+    
+    #file {
+        width: 444px;
+    }
+    
     /* RESPONSIVE CSS
     -------------------------------------------------- */
 

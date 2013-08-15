@@ -17,10 +17,10 @@
   </head>
   <body>    
     <!-- Modal input -->
-    <div id="inputModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div id="inputModal" class="modal hide fade" tabindex="-1" role="dialog">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="myModalLabel">Modal header</h3>
+            <h3 id="myModalLabel">Edit EPANET Model</h3>
         </div>
         <div class="modal-body">
             <textarea id="inputTextarea">[TITLE]
@@ -156,8 +156,8 @@ P2 10.1661784174 51.8015397878
             </textarea>
         </div>
         <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-            <button class="btn btn-primary">Save changes</button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+            <button class="btn btn-primary" onclick="runButton()">Save changes</button>
         </div>
     </div>
       
@@ -228,27 +228,22 @@ P2 10.1661784174 51.8015397878
     </div><!-- /.carousel -->
 
 
-
-    <!-- Marketing messaging and featurettes
-    ================================================== -->
-    <!-- Wrap the rest of the page in another container to center all the content. -->
-
     <div class="container marketing">
 
       <!-- Three columns of text below the carousel -->
       <div class="row">
         <div class="span8">
-          <img class="img-circle" data-src="holder.js/140x140">
+          <img class="img-circle" data-src="holder.js/140x140"/>
           <h2>Input</h2>        
-          <p><input class="btn btn-larg" type="file" id="file" style="display: none"/> 
+          <div class="btn-group" id="inputButtons"><input class="btn btn-larg" type="file" id="file" style="display: none"/> 
               <a class="btn btn-large" href="#">Save</a>              
               <a href="#inputModal" role="button" class="btn btn-large" data-toggle="modal">Edit</a>
-          </p>
+          </div>
            <pre id="inputPre">
            </pre>          
         </div><!-- /.span8 -->
         <div class="span8">
-          <img class="img-circle" data-src="holder.js/140x140">
+          <img class="img-circle" data-src="holder.js/140x140"/>
           <h2>Analysis</h2>
           <div class="well well-small" id="status"><span class="label label-success">Success</span></div>         
           <pre id="output"></pre>
@@ -265,10 +260,6 @@ P2 10.1661784174 51.8015397878
     </div><!-- /.container -->
 
 
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script>
@@ -291,7 +282,7 @@ function handleFileSelect(evt) {
     reader = new FileReader();
   reader.onload = (function(theFile) {
             return function(e) {
-              document.getElementById('input').value = e.target.result;
+              document.getElementById('inputTextarea').value = e.target.result;
 	      runButton();
             };
           })(f);
