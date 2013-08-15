@@ -193,6 +193,10 @@ text.id {
         text-align: left;
     }
     
+    .carousel-container {
+        top: -500px;   
+    }
+    
     input.btn {float:left; height: 30px; font-size: 18px; padding-top: 8px; line-height:20px;}
     
     #inputPre, #output {

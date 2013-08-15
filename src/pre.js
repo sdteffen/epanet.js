@@ -35,27 +35,8 @@ runButton = function() {
     Module.run();
 }
 
-function parseINP(inp) {
-    var regex = {
-        section: /^\s*\[\s*([^\]]*)\s*\].*$/,
-        value: /\s*([^\s]+)([^;]*).*$/,
-        comment: /^\s*;.*$/
-    };
-    var model = {};
-    var lines = inp.split(/\r\n|\r|\n/);
-    var section = null;
-    lines.forEach(function(line) {
-        if (regex.comment.test(line)) {
-            return;
-        } else if (regex.section.test(line)) {
-            var s = line.match(regex.section);
-            model[s[1]] = {};
-            section = s[1];
-        } else if (regex.value.test(line)) {
-            var v = line.match(regex.value);
-            model[section][v[1]] = v[2];
-        }
-        ;
-    });
-    return model;
+saveButton = function () {
+    var inp = $('#inputTextarea').val(),
+        blob = new Blob([inp], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, "epanet.js.inp");
 }

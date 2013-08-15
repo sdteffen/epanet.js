@@ -1,4 +1,50 @@
-// d3.js rendering
+// Parser for EPANET INP files
+d3.inp = function() {
+    function inp() {
+    }
+
+    inp.parse = function(text) {
+        var regex = {
+            section: /^\s*\[\s*([^\]]*)\s*\].*$/,
+            value: /\s*([^\s]+)([^;]*).*$/,
+            comment: /^\s*;.*$/
+        },
+        parser = {
+            COORDINATES: function(line) {
+                var m = line.match(/\s*([0-9\.]+)\s+([0-9\.]+)/)
+                c = {};
+                if (m && m.length && 3 == m.length)
+                {
+                    c.x = m[1];
+                    c.y = m[2];
+                }
+                return c;
+            }
+        },
+        model = {COORDINATES: {}},
+                lines = text.split(/\r\n|\r|\n/),
+                section = null;
+        lines.forEach(function(line) {
+            if (regex.comment.test(line)) {
+                return;
+            } else if (regex.section.test(line)) {
+                var s = line.match(regex.section);
+                model[s[1]] = {};
+                section = s[1];
+            } else if (regex.value.test(line)) {
+                var v = line.match(regex.value);
+                if (parser[section])
+                    model[section][v[1]] = parser[section](v[2]);
+                else
+                    model[section][v[1]] = v[2];
+            }
+            ;
+        });
+        return model;
+    };
+
+    return inp;
+};
 
 function node2node(sectionnodes)
 {
@@ -28,24 +74,37 @@ var width = window.innerWidth || document.documentElement.clientWidth || d.getEl
         nodes = [];
 
 function rendersvg() {
-    nodemap = {};
-    lastNodeId = 0;
-    links=[];
-    nodes=[]
-    d3.selectAll('svg').remove();
-    var svg = d3.select('#simple_model')
-            .append('svg')
-            .attr('width', width)
-            .attr('height', height)
-            .attr('viewBox', '10.16 51.79 0.05 0.05')
-            .attr('style', 'border: 1px solid red;')
-            .attr('id', 'svg');
-
-    var 
-            model = parseINP(document.getElementById('inputTextarea').value),            
+    var nodemap = {},
+            lastNodeId = 0,
+            links = [],
+            nodes = [],
+            svg = d3.select('#svgSimple'),
+            model = d3.inp().parse(document.getElementById('inputTextarea').value),
             nodesections = ['JUNCTIONS', 'RESERVOIRS', 'TANKS'],
-            linksections = ['PIPES', 'VALVES', 'PUMPS'];
+            linksections = ['PIPES', 'VALVES', 'PUMPS'],
+            coords = d3.values(model.COORDINATES),
+            x = function (c) {return c.x},
+            y = function (c) {return c.y},
+            minx = d3.min(coords, x),
+            miny = d3.min(coords, y),
+            height = (d3.max(coords, y)-miny),
+            width = (d3.max(coords, x)-minx)
+            scale = width*0.1;
 
+    svg.attr('viewBox', (minx-scale)+' '+(miny-scale)+' '+(width+2*scale)+' '+(height+2*scale));
+    console.log('viewBox', minx+' '+miny+' '+(d3.max(coords, x)-minx)+' '+(d3.max(coords, y)-miny));
+    
+    for (var coordinate in model.COORDINATES)
+    {
+        var c = model.COORDINATES[coordinate];
+        console.log(c.x+ ' '+c.y);
+        svg.append('circle')
+                .attr('cx', c.x)
+                .attr('cy', c.y)
+                .attr('r', height/75)
+                .attr('style', 'fill: white;');
+    }
+    /*
     for (var s in nodesections)
     {
         var section = nodesections[s]
@@ -59,19 +118,8 @@ function rendersvg() {
         console.log(section);
         if (model[section])
             link2link(model[section]);
-    }
+    }*/
 
-    for (var c in model.COORDINATES)
-    {
-        var coordinate = model.COORDINATES[c],
-                cx = coordinate.replace(/ *([^ ]+) .*$/, '$1'),
-                cy = coordinate.replace(/^ *[^ ]+ +/, '');
-        console.log(coordinate + ':' + cx + ',' + cy);
-        svg.append('circle')
-                .attr('cx', cx)
-                .attr('cy', cy)
-                .attr('r', '0.001')
-                .attr('style', 'fill: white;');
-    }
+   
 
 }
