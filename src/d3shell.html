@@ -169,30 +169,24 @@ P2 10.1661784174 51.8015397878
 
         <div class="navbar navbar-inverse">
           <div class="navbar-inner">
-            <!-- Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize. -->
-            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
             <a class="brand" href="#">epanet.js</a>
-            <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
             <div class="nav-collapse collapse">
               <ul class="nav">
-                <li class="active"><a href="http://epanet.de/">epanet.de</a></li>
-                <!-- Read about Bootstrap dropdowns at http://twbs.github.com/bootstrap/javascript.html#dropdowns -->
+                <li><a href="http://epanet.de/">epanet.de</a></li>
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Samples <b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#">simple.inp</a></li>
+                  <ul class="dropdown-menu">                    
+                    <li class="nav-header">EPANET examples</li>
+                    <li><a href="javascript:loadSample('Net1.inp')">Net1.inp</a></li>
+                    <li><a href="javascript:loadSample('Net2.inp')">Net2.inp</a></li>
+                    <li><a href="javascript:loadSample('Net3.inp')">Net3.inp</a></li>
                     <li class="divider"></li>
-                    <li class="nav-header">Nav header</li>
-                    <li><a href="#">Separated link</a></li>
-                    <li><a href="#">One more separated link</a></li>
+                    <li class="nav-header">epanet.js examples</li>
+                    <li><a href="javascript:loadSample('simple.inp')">simple.inp</a></li>                    
                   </ul>
                 </li>
-              </ul>
-            </div><!--/.nav-collapse -->
+                <li><a href="http://epanet.de/developer/epanetjs.html">Developers</a></li>
+              </ul><!-- .nav -->
           </div><!-- /.navbar-inner -->
         </div><!-- /.navbar -->
 
@@ -237,11 +231,12 @@ P2 10.1661784174 51.8015397878
         <div class="span8">
 
           <h2>Input</h2>        
-          <div class="btn-group" id="inputButtons"><input class="btn btn-larg" type="file" id="file" style="display: none"/> 
-              <a class="btn btn-large" href="javascript:saveButton()">Save</a>              
+          <div class="btn-group" id="inputButtons">
+              <input class="btn btn-larg" type="file" id="file" style="display: none" data-toggle="tooltip" title="File is kept locally in your browser. It is not sent to the server."/> 
+              <a class="btn btn-large" href="javascript:saveButton()" data-toggle="tooltip" title="Save model in INP format.">Save</a>              
               <a href="#inputModal" role="button" class="btn btn-large" data-toggle="modal">Edit</a>
           </div>
-           <pre id="inputPre">
+           <pre id="inputPre" data-toggle="tooltip" title="Click to edit">
            </pre>          
         </div><!-- /.span8 -->
         <div class="span8">
@@ -255,17 +250,16 @@ P2 10.1661784174 51.8015397878
       <!-- FOOTER -->
       <footer>
         <p class="pull-right"><a href="#">Back to top</a></p>
-        <p>&copy; 2013 Steffen Macke <a href="mailto:sdteffen@gmail.com">sdteffen@gmail.com</a> &middot; <a href="http://epanet.de/privacypolicy.html.en">Privacy</a> &middot; <a href="http://epanet.de/imprint.html.en">Imprint</a></p>
+        <p>&copy; 2013 Steffen Macke <a href="mailto:sdteffen@gmail.com">sdteffen@gmail.com</a> and others &middot; <a href="http://epanet.de/privacypolicy.html.en">Privacy</a> &middot; <a href="http://epanet.de/imprint.html.en">Imprint</a></p>
         <p>Epanet.de is not affiliated with or managed by the United States Environmental Protection Agency or any other governmental agency. </p>
       </footer>
 
     </div><!-- /.container -->
 
 
-    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/FileSaver.min.js"></script>
-    <script src=""></script>
     <script>
       !function ($) {
         $(function(){
@@ -292,6 +286,7 @@ function handleFileSelect(evt) {
   reader.readAsText(f);
 }
 document.getElementById('file').addEventListener('change', handleFileSelect, false);
+$('#inputPre').on('click', function () {$('#inputModal').modal('show');});
 
       // connect to canvas
       var Module = {

@@ -1,2 +1,4 @@
 Steffen Macke <info@epanet.de>
 Lewis Rossman for the original EPANET 2 sources.
+
+epanet.js uses several libraries. See README.md for the details.
