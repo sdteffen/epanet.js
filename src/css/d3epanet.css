@@ -170,10 +170,6 @@ text.id {
     }
 
 
-
-    /* MARKETING CONTENT
-    -------------------------------------------------- */
-
     /* Center align the text within the three columns below the carousel */
     .marketing .span8 {
       text-align: center;
@@ -192,9 +188,14 @@ text.id {
         width: 620px;
     }
     
+    .well-small {
+        margin-bottom: 14px;
+        text-align: left;
+    }
+    
     input.btn {float:left; height: 30px; font-size: 18px; padding-top: 8px; line-height:20px;}
     
-    #input, #output {text-align:left;}
+    #inputPre, #output {text-align:left;}
 
     /* RESPONSIVE CSS
     -------------------------------------------------- */

@@ -42,7 +42,7 @@ function rendersvg() {
             .attr('id', 'svg');
 
     var 
-            model = parseINP(d3.select('#input').html()),            
+            model = parseINP(document.getElementById('inputTextarea').value),            
             nodesections = ['JUNCTIONS', 'RESERVOIRS', 'TANKS'],
             linksections = ['PIPES', 'VALVES', 'PUMPS'];
 

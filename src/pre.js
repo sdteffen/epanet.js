@@ -4,7 +4,9 @@ var preRun = function() {
     FS.ignorePermissions = true;
     try
     {
-        FS.createDataFile('/', 'input.inp', $('input').html(), true, true);
+        var inp = document.getElementById('inputTextarea').value;
+        $('#inputPre').html(inp);
+        FS.createDataFile('/', 'input.inp', inp, true, true);
     } catch (e) {
         console.log('/input.inp creation failed');
     }

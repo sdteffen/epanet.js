@@ -15,91 +15,15 @@
     
     <link rel="stylesheet" href="css/d3epanet.css" />
   </head>
-  <body>
-      
-      
-    <!-- NAVBAR
-    ================================================== -->
-    <div class="navbar-wrapper">
-      <!-- Wrap the .navbar in .container to center it within the absolutely positioned parent. -->
-      <div class="container">
-
-        <div class="navbar navbar-inverse">
-          <div class="navbar-inner">
-            <!-- Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize. -->
-            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            <a class="brand" href="#">epanet.js</a>
-            <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
-            <div class="nav-collapse collapse">
-              <ul class="nav">
-                <li class="active"><a href="http://epanet.de/">epanet.de</a></li>
-                <!-- Read about Bootstrap dropdowns at http://twbs.github.com/bootstrap/javascript.html#dropdowns -->
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Samples <b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#">simple.inp</a></li>
-                    <li class="divider"></li>
-                    <li class="nav-header">Nav header</li>
-                    <li><a href="#">Separated link</a></li>
-                    <li><a href="#">One more separated link</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </div><!--/.nav-collapse -->
-          </div><!-- /.navbar-inner -->
-        </div><!-- /.navbar -->
-
-      </div> <!-- /.container -->
-    </div><!-- /.navbar-wrapper -->
-
-
-
-    <!-- Carousel
-    ================================================== -->
-    <div id="myCarousel" class="carousel slide">
-      <div class="carousel-inner">
-        <div class="item active" id="simple_model">          
-          <div class="container">
-            <div class="carousel-caption">
-              <h1>Simplified model</h1>              
-              <a class="btn btn-large btn-primary" href="javascript:runButton();">Run analysis</a>
-            </div>
-          </div>
+  <body>    
+    <!-- Modal input -->
+    <div id="inputModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Modal header</h3>
         </div>
-        <div class="item" id="analysis_model">
-          <div class="container">
-            <div class="carousel-caption">
-              <h1>Analysis model</h1>
-              <p class="lead">Overview.</p>
-              <a class="btn btn-large btn-primary" href="javascript:runButton();">Run analysis</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <a class="left carousel-control" href="#myCarousel" data-slide="prev">&lsaquo;</a>
-      <a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;</a>
-    </div><!-- /.carousel -->
-
-
-
-    <!-- Marketing messaging and featurettes
-    ================================================== -->
-    <!-- Wrap the rest of the page in another container to center all the content. -->
-
-    <div class="container marketing">
-
-      <!-- Three columns of text below the carousel -->
-      <div class="row">
-        <div class="span8">
-          <img class="img-circle" data-src="holder.js/140x140">
-          <h2>Input</h2>        
-          <p><input class="btn btn-larg" type="file" id="file" style="display: none"/> <a class="btn btn-large" href="#">Save</a></p>
-           <pre id="input">
-[TITLE]
+        <div class="modal-body">
+            <textarea id="inputTextarea">[TITLE]
 Simple epanet.js model
 
 [JUNCTIONS] ; created by GHydraulics
@@ -228,12 +152,105 @@ P2 10.1661784174 51.8015397878
 
 [BACKDROP]
 
-[END]</pre>
+[END]
+            </textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+            <button class="btn btn-primary">Save changes</button>
+        </div>
+    </div>
+      
+    <!-- NAVBAR
+    ================================================== -->
+    <div class="navbar-wrapper">
+      <!-- Wrap the .navbar in .container to center it within the absolutely positioned parent. -->
+      <div class="container">
+
+        <div class="navbar navbar-inverse">
+          <div class="navbar-inner">
+            <!-- Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize. -->
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="#">epanet.js</a>
+            <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
+            <div class="nav-collapse collapse">
+              <ul class="nav">
+                <li class="active"><a href="http://epanet.de/">epanet.de</a></li>
+                <!-- Read about Bootstrap dropdowns at http://twbs.github.com/bootstrap/javascript.html#dropdowns -->
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Samples <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#">simple.inp</a></li>
+                    <li class="divider"></li>
+                    <li class="nav-header">Nav header</li>
+                    <li><a href="#">Separated link</a></li>
+                    <li><a href="#">One more separated link</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div><!--/.nav-collapse -->
+          </div><!-- /.navbar-inner -->
+        </div><!-- /.navbar -->
+
+      </div> <!-- /.container -->
+    </div><!-- /.navbar-wrapper -->
+
+
+
+    <!-- Carousel
+    ================================================== -->
+    <div id="myCarousel" class="carousel slide">
+      <div class="carousel-inner">
+        <div class="item active" id="simple_model">          
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>Simplified model</h1>              
+              <a class="btn btn-large btn-primary" href="javascript:runButton();">Run analysis</a>
+            </div>
+          </div>
+        </div>
+        <div class="item" id="analysis_model">
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>Analysis model</h1>
+              <p class="lead">Overview.</p>
+              <a class="btn btn-large btn-primary" href="javascript:runButton();">Run analysis</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a class="left carousel-control" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+      <a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;</a>
+    </div><!-- /.carousel -->
+
+
+
+    <!-- Marketing messaging and featurettes
+    ================================================== -->
+    <!-- Wrap the rest of the page in another container to center all the content. -->
+
+    <div class="container marketing">
+
+      <!-- Three columns of text below the carousel -->
+      <div class="row">
+        <div class="span8">
+          <img class="img-circle" data-src="holder.js/140x140">
+          <h2>Input</h2>        
+          <p><input class="btn btn-larg" type="file" id="file" style="display: none"/> 
+              <a class="btn btn-large" href="#">Save</a>              
+              <a href="#inputModal" role="button" class="btn btn-large" data-toggle="modal">Edit</a>
+          </p>
+           <pre id="inputPre">
+           </pre>          
         </div><!-- /.span8 -->
         <div class="span8">
           <img class="img-circle" data-src="holder.js/140x140">
-          <h2>Analysis</h2>          
-          <p><a class="btn" href="#">View details &raquo;</a></p>
+          <h2>Analysis</h2>
+          <div class="well well-small" id="status"><span class="label label-success">Success</span></div>         
           <pre id="output"></pre>
         </div><!-- /.span8 -->        
       </div><!-- /.row -->
@@ -261,11 +278,7 @@ P2 10.1661784174 51.8015397878
           $('#myCarousel').carousel()
         })
       }(window.jQuery)
-    </script>
-      
-      
-        <div id="status">epanet.js...</div>
-    
+    </script>    
   </body>
   <script type="text/javascript">
 if(window.File && window.FileReader && window.FileList)
