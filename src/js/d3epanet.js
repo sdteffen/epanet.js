@@ -28,7 +28,7 @@ d3.inp = function() {
                 section[key] = v;
             },
             PIPES: function(section, key, line) {                
-                var m = line.match(/\s*([^\s]+)\s+([^\s]+)\s+([0-9\.]+)\s([0-9\.]+)\s+([0-9\.]+)\s+([0-9\.]+)\s+(.*)/);
+                var m = line.match(/\s*([^\s;]+)\s+([^\s;]+)\s+([0-9\.]+)\s+([0-9\.]+)\s+([0-9\.]+)\s+([0-9\.]+)\s+([^;]).*/);
                 if(m && m.length && 8 == m.length)
                     {
                         section[key] = {NODE1: m[1], NODE2: m[2], LENGTH: m[3], 
@@ -63,25 +63,6 @@ d3.inp = function() {
     return inp;
 };
 
-function node2node(sectionnodes)
-{
-    for (var node in sectionnodes)
-    {
-        nodemap[node] = lastNodeId;
-        nodes[lastNodeId++] = {id: node, reflexive: false}
-    }
-}
-
-function link2link(sectionlinks)
-{
-    for (var pipe in sectionlinks)
-    {
-        var source = nodes[nodemap[sectionlinks[pipe].replace(/ *([^ ]+) .*/, '$1')]],
-                target = nodes[nodemap[sectionlinks[pipe].replace(/ *[^ ]+ +([^ ]+) .*/, '$1')]];
-        links[links.length] = {source: source, target: target, left: false, right: true};
-    }
-}
-
 var width = window.innerWidth || document.documentElement.clientWidth || d.getElementsByTagName('body')[0].clientWidth,
         height = 500,
         colors = d3.scale.category10(),
@@ -91,22 +72,24 @@ var width = window.innerWidth || document.documentElement.clientWidth || d.getEl
         nodes = [];
 
 function rendersvg() {
-    var nodemap = {},
-            lastNodeId = 0,
-            links = [],
-            nodes = [],
-            svg = d3.select('#svgSimple'),
+    var svg = d3.select('#svgSimple'),
             model = d3.inp().parse(document.getElementById('inputTextarea').value),
             nodesections = ['JUNCTIONS', 'RESERVOIRS', 'TANKS'],
-            linksections = ['PIPES', 'VALVES', 'PUMPS'],
-            coords = d3.values(model.COORDINATES),
+            linksections = ['PIPES', 'VALVES', 'PUMPS'];
+    svg.selectAll('line').remove();
+    svg.selectAll('circle').remove();
+    if(!model.COORDINATES)
+        return;
+    var coords = d3.values(model.COORDINATES),
             x = function (c) {return c.x},
             y = function (c) {return c.y},
             minx = d3.min(coords, x),
             miny = d3.min(coords, y),
             height = (d3.max(coords, y)-miny),
             width = (d3.max(coords, x)-minx)
-            scale = width*0.1;
+            scale = width*0.1,
+            nodeSize = height/75,
+            strokeWidth = height/200;
 
     svg.attr('viewBox', (minx-scale)+' '+(miny-scale)+' '+(width+2*scale)+' '+(height+2*scale));
     console.log('viewBox', minx+' '+miny+' '+(d3.max(coords, x)-minx)+' '+(d3.max(coords, y)-miny));
@@ -118,26 +101,33 @@ function rendersvg() {
         svg.append('circle')
                 .attr('cx', c.x)
                 .attr('cy', c.y)
-                .attr('r', height/75)
+                .attr('r', nodeSize)
                 .attr('style', 'fill: white;');
     }
-    /*
-    for (var s in nodesections)
-    {
-        var section = nodesections[s]
-        if (model[section])
-            node2node(model[section]);
+    
+    for (var section in linksections) {
+        var s = linksections[section];
+        console.log(s);
+        if(model[s]) {
+            for (var link in model[s]) {
+                var l = model[s][link],
+                        node1 = l.NODE1 || false,
+                        node2 = l.NODE2 || false,
+                        c1 = model.COORDINATES[node1] || false,
+                        c2 = model.COORDINATES[node2] || false;
+                console.log(l+', '+node1+', '+node2+', '+c1+', '+c2);
+                if(c1 && c2) {
+                        svg.append('line')
+                                .attr('x1', c1.x)
+                                .attr('y1', c1.y)
+                                .attr('x2', c2.x)
+                                .attr('y2', c2.y)
+                                .attr('stroke', 'white')
+                                .attr('stroke-width', strokeWidth);
+               }
+            }
+        }
     }
-
-    for (var s in linksections)
-    {
-        var section = linksections[s];
-        console.log(section);
-        if (model[section])
-            link2link(model[section]);
-    }*/
-
-   
 
 }
 
