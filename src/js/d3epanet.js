@@ -10,15 +10,32 @@ d3.inp = function() {
             comment: /^\s*;.*$/
         },
         parser = {
-            COORDINATES: function(line) {
+            COORDINATES: function(section, key, line) {
+                var m = line.match(/\s*([0-9\.]+)\s+([0-9\.]+)/);                
+                if (m && m.length && 3 == m.length)
+                    section[key] = {x:m[1], y: m[2]};            
+            },
+            VERTICES: function(section, key, line) {
                 var m = line.match(/\s*([0-9\.]+)\s+([0-9\.]+)/)
+                v = section[key] || [];
                 c = {};
                 if (m && m.length && 3 == m.length)
                 {
                     c.x = m[1];
                     c.y = m[2];
                 }
-                return c;
+                v[v.length] = c;
+                section[key] = v;
+            },
+            PIPES: function(section, key, line) {                
+                var m = line.match(/\s*([^\s]+)\s+([^\s]+)\s+([0-9\.]+)\s([0-9\.]+)\s+([0-9\.]+)\s+([0-9\.]+)\s+(.*)/);
+                if(m && m.length && 8 == m.length)
+                    {
+                        section[key] = {NODE1: m[1], NODE2: m[2], LENGTH: m[3], 
+                                    DIAMETER: m[4], ROUGHNESS: m[5], 
+                                    MINORLOSS: m[6], STATUS: m[7]};
+                    }
+                    
             }
         },
         model = {COORDINATES: {}},
@@ -34,7 +51,7 @@ d3.inp = function() {
             } else if (regex.value.test(line)) {
                 var v = line.match(regex.value);
                 if (parser[section])
-                    model[section][v[1]] = parser[section](v[2]);
+                    parser[section](model[section], v[1], v[2]);
                 else
                     model[section][v[1]] = v[2];
             }
