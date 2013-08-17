@@ -90,6 +90,25 @@ function svgRemoveAll(svg) {
     svg.selectAll('polygon').remove();
 }
 
+function svgTooltip(element) {
+    var svg = d3.select('#'+element.parentNode.id),
+        a = element.attributes,
+        r = parseFloat(a['r'].value);
+    svg.select('.svgtooltip').remove();
+    svg.append('text')
+        .attr('x', parseFloat(a['cx'].value)+r)
+        .attr('y', parseFloat(a['cy'].value)-r)
+        .text(a['title'].value)
+        .attr('class', 'svgtooltip')
+        .attr('style', 'font-family: Verdana, Arial, sans; font-size:'+(r*4))
+        .attr('fill', 'white');
+}
+
+function svgClearTooltips(element) {
+    var svg = d3.select('#'+element.parentNode.id);
+    svg.select('.svgtooltip').remove();
+}
+
 function rendersvg() {
     var svg = d3.select('#svgSimple'),
             model = d3.inp().parse(document.getElementById('inputTextarea').value),
@@ -138,6 +157,9 @@ function rendersvg() {
                 .attr('cx', c.x)
                 .attr('cy', top-c.y)
                 .attr('r', nodeSize)
+                .attr('title', coordinate)
+                .attr('onmouseover', 'svgTooltip(evt.target)')
+                .attr('onmouseout', 'svgClearTooltips(evt.target)')
                 .attr('style', 'fill: white;');
         }
     }
