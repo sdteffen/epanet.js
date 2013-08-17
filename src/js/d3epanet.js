@@ -13,7 +13,7 @@ d3.inp = function() {
             COORDINATES: function(section, key, line) {
                 var m = line.match(/\s*([0-9\.]+)\s+([0-9\.]+)/);                
                 if (m && m.length && 3 == m.length)
-                    section[key] = {x:m[1], y: m[2]};            
+                    section[key] = {x: parseFloat(m[1]), y: parseFloat(m[2])};            
             },
             VERTICES: function(section, key, line) {
                 var m = line.match(/\s*([0-9\.]+)\s+([0-9\.]+)/)
@@ -21,8 +21,8 @@ d3.inp = function() {
                 c = {};
                 if (m && m.length && 3 == m.length)
                 {
-                    c.x = m[1];
-                    c.y = m[2];
+                    c.x = parseFloat(m[1]);
+                    c.y = parseFloat(m[2]);
                 }
                 v[v.length] = c;
                 section[key] = v;
@@ -31,9 +31,9 @@ d3.inp = function() {
                 var m = line.match(/\s*([^\s;]+)\s+([^\s;]+)\s+([0-9\.]+)\s+([0-9\.]+)\s+([0-9\.]+)\s+([0-9\.]+)\s+([^;]).*/);
                 if(m && m.length && 8 == m.length)
                     {
-                        section[key] = {NODE1: m[1], NODE2: m[2], LENGTH: m[3], 
-                                    DIAMETER: m[4], ROUGHNESS: m[5], 
-                                    MINORLOSS: m[6], STATUS: m[7]};
+                        section[key] = {NODE1: m[1], NODE2: m[2], LENGTH: parseFloat(m[3]), 
+                                    DIAMETER: parseFloat(m[4]), ROUGHNESS: parseFloat(m[5]), 
+                                    MINORLOSS: parseFloat(m[6]), STATUS: m[7]};
                     }
                     
             }
@@ -78,7 +78,7 @@ function rendersvg() {
             linksections = ['PIPES', 'VALVES', 'PUMPS'];
     svg.selectAll('line').remove();
     svg.selectAll('circle').remove();
-    if(!model.COORDINATES)
+    if('object' != typeof model.COORDINATES)
         return;
     var coords = d3.values(model.COORDINATES),
             x = function (c) {return c.x},
@@ -87,12 +87,12 @@ function rendersvg() {
             miny = d3.min(coords, y),
             height = (d3.max(coords, y)-miny),
             width = (d3.max(coords, x)-minx)
-            scale = width*0.1,
+            scale = width*0.2,
             nodeSize = height/75,
             strokeWidth = height/200;
 
-    svg.attr('viewBox', (minx-scale)+' '+(miny-scale)+' '+(width+2*scale)+' '+(height+2*scale));
-    console.log('viewBox', minx+' '+miny+' '+(d3.max(coords, x)-minx)+' '+(d3.max(coords, y)-miny));
+    svg.attr('viewBox', (minx-scale)+' '+(miny-1.7*scale)+' '+(width+0.5*scale)+' '+(height+2*scale));
+    console.log('viewBox', (minx-scale)+' '+(miny-scale)+' '+(width+0.5*scale)+' '+(height+2*scale));
     
     for (var coordinate in model.COORDINATES)
     {

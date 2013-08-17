@@ -143,18 +143,10 @@ text.id {
       height: 500px;
       background-color: #444;
     }
-    .carousel img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      min-width: 100%;
-      height: 500px;
-    }
 
     .carousel-caption {
       background-color: transparent;
       position: static;
-      max-width: 550px;
       padding: 0 20px;
       margin-top: 200px;
     }
@@ -168,7 +160,10 @@ text.id {
     .carousel-caption .btn {
       margin-top: 10px;
     }
-
+    .carousel-container {
+        top: -500px;
+        width: 90%;
+    }
 
     /* Center align the text within the three columns below the carousel */
     .marketing .span8 {
@@ -192,11 +187,7 @@ text.id {
         margin-bottom: 14px;
         text-align: left;
     }
-    
-    .carousel-container {
-        top: -500px;   
-    }
-    
+        
     input.btn {float:left; height: 30px; font-size: 18px; padding-top: 8px; line-height:20px;}
     
     #inputPre, #output {
@@ -240,6 +231,7 @@ text.id {
         width: auto;
         height: 500px;
       }
+      
 
     }
 
@@ -254,9 +246,7 @@ text.id {
         margin-left: -20px;
         margin-right: -20px;
       }
-      .carousel .container {
-
-      }
+ 
       .carousel .item {
         height: 300px;
       }
@@ -281,4 +271,5 @@ text.id {
       }
 
     }
+    
 
