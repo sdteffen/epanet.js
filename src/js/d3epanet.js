@@ -153,7 +153,9 @@ function rendersvg() {
                         c2 = model.COORDINATES[node2] || false;                
                 if (c1 && c2) {
                     var centerx = (c1.x+c2.x)/2,
-                        centery = (c1.y+c2.y)/2;
+                        centery = (c1.y+c2.y)/2,
+                        angle = 180/Math.PI*Math.atan2(c1.y-c2.y, c2.x-c1.x),
+                            transform = 'rotate('+angle+' '+centerx+' '+(top-centery)+')'; ;
                     svg.append('line')
                             .attr('x1', c1.x)
                             .attr('y1', top-c1.y)
@@ -173,17 +175,20 @@ function rendersvg() {
                             .attr('height', nodeSize)
                             .attr('x', centerx)
                             .attr('y', top-centery-nodeSize)
+                            .attr('transform', transform)
                             .attr('style', 'fill:white;');
-                    } else if('VALVES' == s) {
+                    } else if('VALVES' == s) {                       
                          svg.append('polygon')
-                            .attr('points', (c.x - nodeSize)+' '+(top-c.y-nodeSize)+ ' '+
-                                (c.x + nodeSize)+' '+(top-c.y-nodeSize)+ ' '+
-                                c.x+' '+(top-c.y+nodeSize))
+                            .attr('points', (centerx + nodeSize)+' '+(top-centery-nodeSize)+ ' '+
+                                centerx+' '+(top-centery)+ ' '+
+                                (centerx+nodeSize)+' '+(top-centery+nodeSize))
+                            .attr('transform', transform)
                             .attr('style', 'fill:white;');
-                        svg.append('polygon')
-                            .attr('points', (c.x - nodeSize)+' '+(top-c.y-nodeSize)+ ' '+
-                                (c.x + nodeSize)+' '+(top-c.y-nodeSize)+ ' '+
-                                c.x+' '+(top-c.y+nodeSize))
+                         svg.append('polygon')
+                            .attr('points', (centerx - nodeSize)+' '+(top-centery-nodeSize)+ ' '+
+                                centerx+' '+(top-centery)+ ' '+
+                                (centerx-nodeSize)+' '+(top-centery+nodeSize))
+                            .attr('transform', transform)
                             .attr('style', 'fill:white;');
                     }
                 }
