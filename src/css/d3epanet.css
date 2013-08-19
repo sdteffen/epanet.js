@@ -1,275 +1,129 @@
 
 svg {
-  background-color: #444;
-  cursor: default;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
+    background-color: #444;
+    cursor: default;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 
 svg:not(.active):not(.ctrl) {
-  cursor: crosshair;
+    cursor: crosshair;
 }
 
 path.link {
-  fill: none;
-  stroke: #000;
-  stroke-width: 4px;
-  cursor: default;
+    fill: none;
+    stroke: #000;
+    stroke-width: 4px;
+    cursor: default;
 }
 
 svg:not(.active):not(.ctrl) path.link {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 path.link.selected {
-  stroke-dasharray: 10,2;
+    stroke-dasharray: 10,2;
 }
 
 path.link.dragline {
-  pointer-events: none;
+    pointer-events: none;
 }
 
 path.link.hidden {
-  stroke-width: 0;
+    stroke-width: 0;
 }
 
 circle.node {
-  stroke-width: 1.5px;
-  cursor: pointer;
+    stroke-width: 1.5px;
+    cursor: pointer;
 }
 
 circle.node.reflexive {
-  stroke: #000 !important;
-  stroke-width: 2.5px;
+    stroke: #000 !important;
+    stroke-width: 2.5px;
 }
 
 text {
-  font: 12px sans-serif;
-  pointer-events: none;
+    font: 12px sans-serif;
+    pointer-events: none;
 }
 
 text.id {
-  text-anchor: middle;
-  font-weight: bold;
-}
-
-#col1, #col2 {
-    width: 800px;
-    height: 800px;
-    float: left;
+    text-anchor: middle;
+    font-weight: bold;
 }
 
 
-    /* GLOBAL STYLES
-    -------------------------------------------------- */
-    /* Padding below the footer and lighter body text */
+/* GLOBAL STYLES
+-------------------------------------------------- */
+/* Padding below the footer and lighter body text */
 
-    body {
-      padding-bottom: 40px;
-      color: #5a5a5a;
+body {
+    padding-bottom: 40px;
+    color: #5a5a5a;
+}
+
+.navbar {
+    margin-bottom: 0px;
+}
+
+.row {width: 1300px;}
+
+#status {
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+#jumbotron {
+    height: 500px;
+    padding: 0px;
+}
+
+#inputPre, #output {
+    text-align:left;
+    overflow-y: auto;
+    white-space: nowrap;
+}
+
+#inputTextarea {
+    width: 97%;
+    height: 20em;
+}
+
+#inputButtons {
+    width: 620px;
+    margin-bottom: 10px;
+}
+
+#file {
+    width: 488px;
+    float:left; 
+    font-size: 18px; 
+    padding-top: 4px; 
+    line-height:20px;
+}
+
+#inputModal .modal-content {
+    width: 979px;
+}
+
+/* RESPONSIVE CSS
+-------------------------------------------------- */
+
+@media (max-width: 979px) {
+
+}
+
+
+@media (max-width: 767px) {
+
+    #inputModal .modal-content {
+        width: 100%;
     }
 
+}
 
-    /* CUSTOMIZE THE NAVBAR
-    -------------------------------------------------- */
-
-    /* Special class on .container surrounding .navbar, used for positioning it into place. */
-    .navbar-wrapper {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 10;
-      margin-top: 20px;
-      margin-bottom: -90px; /* Negative margin to pull up carousel. 90px is roughly margins and height of navbar. */
-    }
-    .navbar-wrapper .navbar {
-
-    }
-
-    /* Remove border and change up box shadow for more contrast */
-    .navbar .navbar-inner {
-      border: 0;
-      -webkit-box-shadow: 0 2px 10px rgba(0,0,0,.25);
-         -moz-box-shadow: 0 2px 10px rgba(0,0,0,.25);
-              box-shadow: 0 2px 10px rgba(0,0,0,.25);
-    }
-
-    /* Downsize the brand/project name a bit */
-    .navbar .brand {
-      padding: 14px 20px 16px; /* Increase vertical padding to match navbar links */
-      font-size: 16px;
-      font-weight: bold;
-      text-shadow: 0 -1px 0 rgba(0,0,0,.5);
-    }
-
-    /* Navbar links: increase padding for taller navbar */
-    .navbar .nav > li > a {
-      padding: 15px 20px;
-    }
-
-    /* Offset the responsive button for proper vertical alignment */
-    .navbar .btn-navbar {
-      margin-top: 10px;
-    }
-
-    /* CUSTOMIZE THE CAROUSEL
-    -------------------------------------------------- */
-
-    /* Carousel base class */
-    .carousel {
-      margin-bottom: 60px;
-    }
-
-    .carousel .container {
-      position: relative;
-      z-index: 9;
-    }
-
-    .carousel-control {
-      height: 80px;
-      margin-top: 0;
-      font-size: 120px;
-      text-shadow: 0 1px 1px rgba(0,0,0,.4);
-      background-color: transparent;
-      border: 0;
-      z-index: 10;
-    }
-
-    .carousel .item {
-      height: 500px;
-      background-color: #444;
-    }
-
-    .carousel-caption {
-      background-color: transparent;
-      position: static;
-      padding: 0 20px;
-      margin-top: 200px;
-    }
-    .carousel-caption h1,
-    .carousel-caption .lead {
-      margin: 0;
-      line-height: 1.25;
-      color: #fff;
-      text-shadow: 0 1px 1px rgba(0,0,0,.4);
-    }
-    .carousel-caption .btn {
-      margin-top: 10px;
-    }
-    .carousel-container {
-        top: -500px;
-        width: 90%;
-    }
-
-    /* Center align the text within the three columns below the carousel */
-    .marketing .span8 {
-      text-align: center;
-    }
-    .marketing h2 {
-      font-weight: normal;
-    }
-    .marketing .span8 p {
-      margin-left: 10px;
-      margin-right: 10px;
-    }
-    
-    .row {width: 1300px;}
-    
-    .span8 {
-        width: 620px;
-    }
-    
-    .well-small {
-        margin-bottom: 14px;
-        text-align: left;
-    }
-        
-    input.btn {float:left; height: 30px; font-size: 18px; padding-top: 8px; line-height:20px;}
-    
-    #inputPre, #output {
-        text-align:left;
-        overflow-y: auto;
-        white-space: nowrap;
-    }
-    
-    #inputTextarea {
-        width: 97%;
-        height: 20em;
-    }
-
-    #inputButtons {
-        width: 620px;
-        margin-bottom: 10px;
-    }
-    
-    #file {
-        width: 444px;
-    }
-        
-    /* RESPONSIVE CSS
-    -------------------------------------------------- */
-
-    @media (max-width: 979px) {
-
-      .container.navbar-wrapper {
-        margin-bottom: 0;
-        width: auto;
-      }
-      .navbar-inner {
-        border-radius: 0;
-        margin: -20px 0;
-      }
-
-      .carousel .item {
-        height: 500px;
-      }
-      .carousel img {
-        width: auto;
-        height: 500px;
-      }
-      
-
-    }
-
-
-    @media (max-width: 767px) {
-
-      .navbar-inner {
-        margin: -20px;
-      }
-
-      .carousel {
-        margin-left: -20px;
-        margin-right: -20px;
-      }
- 
-      .carousel .item {
-        height: 300px;
-      }
-      .carousel img {
-        height: 300px;
-      }
-      .carousel-caption {
-        width: 65%;
-        padding: 0 70px;
-        margin-top: 100px;
-      }
-      .carousel-caption h1 {
-        font-size: 30px;
-      }
-      .carousel-caption .lead,
-      .carousel-caption .btn {
-        font-size: 18px;
-      }
-
-      .marketing .span8 + .span8 {
-        margin-top: 40px;
-      }
-
-    }
-    
 

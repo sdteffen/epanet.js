@@ -80,6 +80,87 @@ d3.inp = function() {
     return inp;
 };
 
+// Read EPANET binary result files
+d3.epanetresult = function () {
+  function epanetresult() {
+      
+  }  
+  
+  epanetresult.i4 = Module._malloc(4);
+  epanetresult.string = Module._malloc(255);
+  
+  epanetresult.parse = function (filename) {      
+    var c = FS.findObject(filename).contents,
+        r = {},
+        er = epanetresult,
+        count = {
+            'NODES': er.readInt(c, 8),
+            'TANKS': er.readInt(c, 12),
+            'LINKS': er.readInt(c, 16),
+            'PUMPS': er.readInt(c, 20)
+        },
+        numReportStart = er.readInt(c, 48),
+        numTimeStep = er.readInt(c, 52),
+        numDuration = er.readInt(c, 56),
+        numPeriods = (numDuration/numTimeStep) + 1,
+        offsetNodeIDs = 884,
+        offsetResults =  offsetNodeIDs + (36 * count['NODES']) + (52 * count['LINKS']) +
+		    (8 * count['TANKS']) + (28 * count['PUMPS']) + 4,
+        i,
+        j;
+    console.log(count);
+    
+	// Nodes
+	//		"node_id,result_demand,result_head,result_pressure,result_quality,timestep\n");
+    for (i = 0; i < numPeriods; i++) {
+        r[i+1] = {'NODES': {}, 'LINKS': {}};
+        for (j = 0; j < count['NODES']; j++) {
+            var id = Module.intArrayToString(Array.prototype.slice.call(c, 
+                offsetNodeIDs +(j*32), offsetNodeIDs + 32 + (j*32)));
+            r[i+1]['NODES'][id] = {'PRESSURE': 1};
+	/*
+				fseek(fileIn, offsetResults + (j * 4),
+				      SEEK_SET);
+				fread(&demand, 4, 1, fileIn);
+				fseek(fileIn,
+				      offsetResults + ((numNodes + j) * 4),
+				      SEEK_SET);
+				fread(&head, 4, 1, fileIn);
+				fseek(fileIn,
+				      offsetResults +
+				      ((2 * numNodes + j) * 4), SEEK_SET);
+				fread(&pressure, 4, 1, fileIn);
+				fseek(fileIn,
+				      offsetResults +
+				      ((3 * numNodes + j) * 4), SEEK_SET);	
+				fread(&quality, 4, 1, fileIn);
+				fprintf(fileOut, "%s,%f,%f,%f,%f,%d\n",
+					strNodeID, demand, head, pressure, quality,
+					i + 1);*/
+			}
+			offsetResults += (16 * count['NODES'] + 32 * count['LINKS']);
+		}
+     console.log(r);
+     return r;
+  }
+  
+  epanetresult.readInt = function(content, offset) {
+    Module.HEAP8.set(new Int8Array(content.slice(offset, offset+4)), epanetresult.i4);
+    Module.ccall('snprintf', 'void', ['string*', 'i8', 'string', 'i8'], 
+        [epanetresult.string, 16, "%d                ", epanetresult.i4]);
+    var i = parseInt(Module.intArrayToString(Array.prototype.slice.call(Module.HEAP8, epanetresult.string, epanetresult.string+16)));
+    return i;
+  }
+  
+  return epanetresult;
+};
+
+// Read EPANET binary result file
+function readBin() {
+    var results = d3.epanetresult().parse('/report.bin');
+}
+
+
 var width = window.innerWidth || document.documentElement.clientWidth || d.getElementsByTagName('body')[0].clientWidth,
         height = 500,
         colors = d3.scale.category10(),
@@ -136,12 +217,12 @@ function rendersvg() {
             maxy = d3.max(coords, y),
             height = (maxy - miny),
             width = (maxx - minx),
-            scale = width * 0.2,
+            scale = width * 0.1,
             top = maxy + scale,
             nodeSize = height / 75,
             strokeWidth = height / 200;
 
-    svg.attr('viewBox', (minx - scale) + ' ' + (-0.7 * scale) + ' ' + (width + 0.5 * scale) + ' ' + (height + 2 * scale));
+    svg.attr('viewBox', (minx - scale) + ' ' + 0 + ' ' + (width + 2*scale) + ' ' + (height + 2*scale));
     
     svg.append('circle')
         .attr('cx', minx + width/2)
@@ -152,8 +233,9 @@ function rendersvg() {
     if(c && c[0] && c[0][0] && c[0][0].getBoundingClientRect)
     {        
         var r = c[0][0].getBoundingClientRect();
-        if(r && r.height && r.width)
-            nodeSize = nodeSize / r.height * 8;        
+        if(r && r.height && r.width) {   
+            nodeSize = nodeSize / r.height * 10;
+        }
     }
     svgRemoveAll(svg);
 

@@ -28,7 +28,8 @@ var preRun = function() {
         l = (0 > m.indexOf('error') ? '<span class="label label-success">Success</span>' 
             : '<span class="label label-important">Error</span>');
     s.html(l + m.replace(/^[ \n]*\.\.\. */, ' '));    
-    $('#output').html(escapeInp(t));    
+    $('#output').html(escapeInp(t));
+    readBin();
 },
         Module = {
     arguments: ['/input.inp', '/report.txt', '/report.bin'],
