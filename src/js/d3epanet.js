@@ -110,46 +110,35 @@ d3.epanetresult = function () {
         j;
     console.log(count);
     
-	// Nodes
-	//		"node_id,result_demand,result_head,result_pressure,result_quality,timestep\n");
+     // Nodes
     for (i = 0; i < numPeriods; i++) {
         r[i+1] = {'NODES': {}, 'LINKS': {}};
         for (j = 0; j < count['NODES']; j++) {
             var id = Module.intArrayToString(Array.prototype.slice.call(c, 
                 offsetNodeIDs +(j*32), offsetNodeIDs + 32 + (j*32)));
-            r[i+1]['NODES'][id] = {'PRESSURE': 1};
-	/*
-				fseek(fileIn, offsetResults + (j * 4),
-				      SEEK_SET);
-				fread(&demand, 4, 1, fileIn);
-				fseek(fileIn,
-				      offsetResults + ((numNodes + j) * 4),
-				      SEEK_SET);
-				fread(&head, 4, 1, fileIn);
-				fseek(fileIn,
-				      offsetResults +
-				      ((2 * numNodes + j) * 4), SEEK_SET);
-				fread(&pressure, 4, 1, fileIn);
-				fseek(fileIn,
-				      offsetResults +
-				      ((3 * numNodes + j) * 4), SEEK_SET);	
-				fread(&quality, 4, 1, fileIn);
-				fprintf(fileOut, "%s,%f,%f,%f,%f,%d\n",
-					strNodeID, demand, head, pressure, quality,
-					i + 1);*/
-			}
-			offsetResults += (16 * count['NODES'] + 32 * count['LINKS']);
-		}
+            r[i+1]['NODES'][id] = {};
+            r[i+1]['NODES'][id] = {
+                'DEMAND': er.readFloat(c, offsetResults + (j*4)),
+                'HEAD': er.readFloat(c, offsetResults + ((count['NODES']+j)*4)),
+                'PRESSURE': er.readFloat(c, offsetResults + ((2 * count['NODES']+j)*4)),
+                'QUALITY': er.readFloat(c, offsetResults + ((3 * count['NODES']+j)*4))
+            };
+
+	}
+	offsetResults += (16 * count['NODES'] + 32 * count['LINKS']);
+    }
      console.log(r);
      return r;
   }
   
   epanetresult.readInt = function(content, offset) {
     Module.HEAP8.set(new Int8Array(content.slice(offset, offset+4)), epanetresult.i4);
-    Module.ccall('snprintf', 'void', ['string*', 'i8', 'string', 'i8'], 
-        [epanetresult.string, 16, "%d                ", epanetresult.i4]);
-    var i = parseInt(Module.intArrayToString(Array.prototype.slice.call(Module.HEAP8, epanetresult.string, epanetresult.string+16)));
-    return i;
+    return Module.getValue(epanetresult.i4, 'i32');
+  }
+  
+  epanetresult.readFloat = function(content, offset) {
+    Module.HEAP8.set(new Int8Array(content.slice(offset, offset+4)), epanetresult.i4);
+    return Module.getValue(epanetresult.i4, 'float');
   }
   
   return epanetresult;
@@ -159,7 +148,6 @@ d3.epanetresult = function () {
 function readBin() {
     var results = d3.epanetresult().parse('/report.bin');
 }
-
 
 var width = window.innerWidth || document.documentElement.clientWidth || d.getElementsByTagName('body')[0].clientWidth,
         height = 500,
@@ -363,4 +351,3 @@ function loadSample(f) {
         runButton();
     });
 }
-

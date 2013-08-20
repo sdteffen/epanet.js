@@ -70,7 +70,13 @@ body {
     margin-bottom: 0px;
 }
 
-.row {width: 1300px;}
+.row {
+    width: 1300px;
+}
+
+.popover-content {
+    font-size: 14px;
+}
 
 #status {
     margin-bottom: 24px;

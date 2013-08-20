@@ -25,30 +25,52 @@
         </div>
         <div class="modal-body">
             <textarea id="inputTextarea">[TITLE]
-Simple epanet.js model
+[TITLE]
+ EPANET Example Network 1
+A simple example of modeling chlorine decay. Both bulk and
+wall reactions are included. 
 
-[JUNCTIONS] ; created by GHydraulics
-PUMP1 25 0 
-PUMP1dn 25 0 
-J1 25   
-G 0 351  
-J0 25   
+[JUNCTIONS]
+;ID              	Elev        	Demand      	Pattern         
+ 10              	710         	0           	                	;
+ 11              	710         	150         	                	;
+ 12              	700         	150         	                	;
+ 13              	695         	100         	                	;
+ 21              	700         	150         	                	;
+ 22              	695         	200         	                	;
+ 23              	690         	150         	                	;
+ 31              	700         	100         	                	;
+ 32              	710         	100         	                	;
 
-[RESERVOIRS] ; created by GHydraulics
-R1 25  
+[RESERVOIRS]
+;ID              	Head        	Pattern         
+ 9               	800         	                	;
 
-[TANKS] ; created by GHydraulics
+[TANKS]
+;ID              	Elevation   	InitLevel   	MinLevel    	MaxLevel    	Diameter    	MinVol      	VolCurve
+ 2               	850         	120         	100         	150         	50.5        	0           	                	;
 
-[PIPES] ; created by GHydraulics
-P4 J1 G 740.791 100 0.1 0 OPEN 
-P2 J0 PUMP1 2.208 100 0.1 0 OPEN 
-P3 PUMP1dn J1 2.68 100 0.1 0 OPEN 
-P1 R1 J0 1.052 100 0.1 0 OPEN 
+[PIPES]
+;ID              	Node1           	Node2           	Length      	Diameter    	Roughness   	MinorLoss   	Status
+ 10              	10              	11              	10530       	18          	100         	0           	Open  	;
+ 11              	11              	12              	5280        	14          	100         	0           	Open  	;
+ 12              	12              	13              	5280        	10          	100         	0           	Open  	;
+ 21              	21              	22              	5280        	10          	100         	0           	Open  	;
+ 22              	22              	23              	5280        	12          	100         	0           	Open  	;
+ 31              	31              	32              	5280        	6           	100         	0           	Open  	;
+ 110             	2               	12              	200         	18          	100         	0           	Open  	;
+ 111             	11              	21              	5280        	10          	100         	0           	Open  	;
+ 112             	12              	22              	5280        	12          	100         	0           	Open  	;
+ 113             	13              	23              	5280        	8           	100         	0           	Open  	;
+ 121             	21              	31              	5280        	8           	100         	0           	Open  	;
+ 122             	22              	32              	5280        	6           	100         	0           	Open  	;
 
-[PUMPS] ; created by GHydraulics
-PUMP1 PUMP1 PUMP1dn POWER 0.1 
+[PUMPS]
+;ID              	Node1           	Node2           	Parameters
+ 9               	9               	10              	HEAD 1	;
 
-[VALVES] ; created by GHydraulics
+[VALVES]
+;ID              	Node1           	Node2           	Diameter    	Type	Setting     	MinorLoss   
 
 [TAGS]
 
@@ -60,24 +82,43 @@ PUMP1 PUMP1 PUMP1dn POWER 0.1
 
 [PATTERNS]
 ;ID              	Multipliers
+;Demand Pattern
+ 1               	1.0         	1.2         	1.4         	1.6         	1.4         	1.2         
+ 1               	1.0         	0.8         	0.6         	0.4         	0.6         	0.8         
 
 [CURVES]
 ;ID              	X-Value     	Y-Value
+;PUMP: Pump Curve for Pump 9
+ 1               	1500        	250         
 
 [CONTROLS]
+ LINK 9 OPEN IF NODE 2 BELOW 110
+ LINK 9 CLOSED IF NODE 2 ABOVE 140
+
 
 [RULES]
 
 [ENERGY]
  Global Efficiency  	75
- Global Price       	0
- Demand Charge      	0
+ Global Price       	0.0
+ Demand Charge      	0.0
 
 [EMITTERS]
 ;Junction        	Coefficient
 
 [QUALITY]
 ;Node            	InitQual
+ 10              	0.5
+ 11              	0.5
+ 12              	0.5
+ 13              	0.5
+ 21              	0.5
+ 22              	0.5
+ 23              	0.5
+ 31              	0.5
+ 32              	0.5
+ 9               	1.0
+ 2               	1.0
 
 [SOURCES]
 ;Node            	Type        	Quality     	Pattern
@@ -90,37 +131,35 @@ PUMP1 PUMP1 PUMP1dn POWER 0.1
  Order Bulk            	1
  Order Tank            	1
  Order Wall            	1
- Global Bulk           	0
- Global Wall           	0
- Limiting Potential    	0
- Roughness Correlation 	0
+ Global Bulk           	-.5
+ Global Wall           	-1
+ Limiting Potential    	0.0
+ Roughness Correlation 	0.0
 
 [MIXING]
 ;Tank            	Model
 
 [TIMES]
- Duration           	0
- Hydraulic Timestep 	1:00
- Quality Timestep   	0:05
- Pattern Timestep   	1:00
- Pattern Start      	0:00
- Report Timestep    	1:00
- Report Start       	0:00
+ Duration           	24:00 
+ Hydraulic Timestep 	1:00 
+ Quality Timestep   	0:05 
+ Pattern Timestep   	2:00 
+ Pattern Start      	0:00 
+ Report Timestep    	1:00 
+ Report Start       	0:00 
  Start ClockTime    	12 am
  Statistic          	None
 
 [REPORT]
  Status             	Yes
- Summary                Yes
+ Summary            	No
  Page               	0
- Nodes                  All
- Links                  All
 
 [OPTIONS]
- Units              	CMD
- Headloss           	D-W
- Specific Gravity   	1
- Viscosity          	1
+ Units              	GPM
+ Headloss           	H-W
+ Specific Gravity   	1.0
+ Viscosity          	1.0
  Trials             	40
  Accuracy           	0.001
  CHECKFREQ          	2
@@ -130,28 +169,38 @@ PUMP1 PUMP1 PUMP1dn POWER 0.1
  Pattern            	1
  Demand Multiplier  	1.0
  Emitter Exponent   	0.5
- Quality            	None mg/L
- Diffusivity        	1
+ Quality            	Chlorine mg/L
+ Diffusivity        	1.0
  Tolerance          	0.01
 
-[COORDINATES] ; created by GHydraulics
-PUMP1 10.1661784174 51.8015397878
-PUMP1dn 10.1661922403 51.8015313179
-J1 10.1662060632 51.8015228479
-G 10.176376908 51.7997067163
-J0 10.1661583145 51.8015552353
-R1 10.1661502734 51.8015632765
-[VERTICES] ; created by GHydraulics
-P4 10.1665175862 51.8013427744
-P4 10.1709055563 51.8008257206
-P4 10.1721213314 51.8005741809
-P4 10.1740358279 51.8004623855
-P4 10.1763416084 51.7997357153
-P2 10.1661784174 51.8015397878
+[COORDINATES]
+;Node            	X-Coord         	Y-Coord
+ 10              	20.00           	70.00           
+ 11              	30.00           	70.00           
+ 12              	50.00           	70.00           
+ 13              	70.00           	70.00           
+ 21              	30.00           	40.00           
+ 22              	50.00           	40.00           
+ 23              	70.00           	40.00           
+ 31              	30.00           	10.00           
+ 32              	50.00           	10.00           
+ 9               	10.00           	70.00           
+ 2               	50.00           	90.00           
+
+[VERTICES]
+;Link            	X-Coord         	Y-Coord
+
 [LABELS]
 ;X-Coord           Y-Coord          Label & Anchor Node
+ 6.99             73.63            "Source"                 
+ 13.48            68.13            "Pump"                 
+ 43.85            91.21            "Tank"                 
 
 [BACKDROP]
+ DIMENSIONS     	7.00            	6.00            	73.00           	94.00           
+ UNITS          	None
+ FILE           	
+ OFFSET         	0.00            	0.00            
 
 [END]
             </textarea>
@@ -199,9 +248,6 @@ P2 10.1661784174 51.8015397878
         </div><!-- .container -->
     </div><!-- .navbar -->
 
-      </div> <!-- .container -->
-    </div><!-- .navbar-wrapper -->
-
     <div id="jumbotron" class="jumbotron">
           <svg id="svgSimple" width="100%" height="100%"></svg>          
     </div>
@@ -212,7 +258,12 @@ P2 10.1661784174 51.8015397878
       <div class="row">
         <div class="col-lg-6">
 
-          <h2>Input</h2>        
+          <h2 class="">Input
+              <button type="button" class="btn btn-default" data-content="Select File-&gt;Export-&gt;Network... in EPANET to save INP files. If opening does not work, open in text editor, then copy and paste." title="" data-toggle="popover" data-original-title="INP file input">
+                <span class="glyphicon glyphicon-question-sign"></span>
+            </button>
+          </h2>
+            
           <div class="well well-sm" id="inputButtons">
               <input type="file" id="file" style="display: none" data-toggle="tooltip" title="File is kept locally in your browser. It is not sent to the server."/> 
               <button class="btn" type="button" role="button" onclick="saveButton()" data-toggle="tooltip" title="Save model in INP format.">Save</button>              
@@ -257,9 +308,8 @@ P2 10.1661784174 51.8015397878
     <script src="js/FileSaver.min.js"></script>
     <script>
       !function ($) {
-        $(function(){
-          // carousel demo
-          $('#myCarousel').carousel()
+        $(function() {
+            $("[data-toggle=popover]").popover();
         })
       }(window.jQuery)
    
