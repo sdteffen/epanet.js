@@ -30,6 +30,7 @@ var preRun = function() {
     s.html(l + m.replace(/^[ \n]*\.\.\. */, ' '));    
     $('#output').html(escapeInp(t));
     readBin();
+    $('#working').modal('hide');
 },
         Module = {
     arguments: ['/input.inp', '/report.txt', '/report.bin'],
@@ -38,6 +39,7 @@ var preRun = function() {
 };
 
 runButton = function() {
+    $('#working').modal('show');
     Module.run();
 }
 

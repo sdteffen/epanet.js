@@ -344,10 +344,17 @@ function rendersvg() {
 }
 
 function loadSample(f) {
-    d3.text('samples/' + f, false, function(error, response) {
-        if (error)
-            return;
-        d3.select('#inputTextarea').text(response);
-        runButton();
-    });
+    $('#working').modal('show');
+    try {
+        d3.text('samples/' + f, false, function(error, response) {
+            if (error) {
+                $('#working').modal('hide');
+                return;
+            }
+            d3.select('#inputTextarea').text(response);
+            runButton();
+        });
+    } catch (e) {
+        $('#working').modal('hide');
+    }
 }
