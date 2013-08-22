@@ -5,13 +5,13 @@ epanet_sources = epanet.c hash.c hydraul.c \
 epanet_headers = enumstxt.h epanet2.h funcs.h hash.h mempool.h text.h \
 	toolkit.h types.h vars.h
 
-d3epanet_js = pre.js library.js d3shell.html
+d3epanet_js = js/pre.js js/library.js shell.html
 
 all: js.html
 	
 js.html: $(epanet_sources) $(epanet_headers) $(d3epanet_js)
 	emcc -O1 $(epanet_sources) -o js.html \
-	--pre-js pre.js --shell-file d3shell.html --js-library library.js
+	--pre-js js/pre.js --shell-file shell.html --js-library js/library.js
 
 clean:
 	-rm -f js.html
