@@ -114,7 +114,7 @@ d3.epanetresult = function() {
 	    r[i + 1] = {'NODES': {}, 'LINKS': {}};
 	    for (j = 0; j < count['NODES']; j++) {
 		var id = Module.intArrayToString(Array.prototype.slice.call(c,
-			offsetNodeIDs + (j * 32), offsetNodeIDs + 32 + (j * 32)));
+			offsetNodeIDs + (j * 32), offsetNodeIDs + 32 + (j * 32))).replace(/[^a-z0-9_\.]/gi, '');
 		r[i + 1]['NODES'][id] = {};
 		r[i + 1]['NODES'][id] = {
 		    'DEMAND': er.readFloat(c, offsetResults + (j * 4)),
@@ -150,6 +150,8 @@ var epanetjs = function() {
     epanetjs.ANALYSIS_WITH_LEGEND = 3;
     
     epanetjs.mode = epanetjs.INPUT;
+    epanetjs.success = false;
+    epanetjs.results = false;
     
     epanetjs.setMode = function (mode) {
 	epanetjs.mode = mode;
@@ -172,11 +174,10 @@ var epanetjs = function() {
 	epanetjs.render();
     };
 
-    epanetjs.svg = function() {
-	var svg = function() {
+    epanetjs.svg = function(colormap) {
+	var svg = function() {};
 
-	};
-
+	svg.colormap = colormap || false;
 	svg.width = window.innerWidth || document.documentElement.clientWidth || d.getElementsByTagName('body')[0].clientWidth;
 	svg.height = 500;
 	svg.colors = d3.scale.category10();
@@ -185,39 +186,39 @@ var epanetjs = function() {
 	svg.links = [];
 	svg.nodes = [];
 
-	svg.removeAll = function(svg) {
-	    svg.selectAll('line').remove();
-	    svg.selectAll('circle').remove();
-	    svg.selectAll('rect').remove();
-	    svg.selectAll('polygon').remove();
-	    svg.selectAll('text').remove();
+	svg.removeAll = function(el) {
+	    el.selectAll('line').remove();
+	    el.selectAll('circle').remove();
+	    el.selectAll('rect').remove();
+	    el.selectAll('polygon').remove();
+	    el.selectAll('text').remove();
 	};
 
 	svg.tooltip = function(element) {
-	    var svg = d3.select('#' + element.parentNode.id),
+	    var el = d3.select('#' + element.parentNode.id),
 		    a = element.attributes,
 		    r = parseFloat(a['r'].value);
-	    svg.select('.svgtooltip').remove();
-	    svg.append('text')
+	    el.select('.svgtooltip').remove();
+	    el.append('text')
 		    .attr('x', parseFloat(a['cx'].value) + r)
 		    .attr('y', parseFloat(a['cy'].value) - r)
 		    .text(a['title'].value)
 		    .attr('class', 'svgtooltip')
-		    .attr('style', 'font-family: Verdana, Arial, sans; font-size:' + (r * 2))
+		    .attr('style', 'font-family: Verdana, Arial, sans; font-size:' + (r * 2)+'pt;')
 		    .attr('fill', 'white');
 	};
 
 	svg.clearTooltips = function(element) {
-	    var svg = d3.select('#' + element.parentNode.id);
-	    svg.select('.svgtooltip').remove();
+	    var parent = d3.select('#' + element.parentNode.id);
+	    parent.select('.svgtooltip').remove();
 	};
 
-	svg.renderModel = function() {
-	    var svg = d3.select('#svgSimple'),
+	svg.render = function() {
+	    var el = d3.select('#svgSimple'),
 		    model = d3.inp().parse(document.getElementById('inputTextarea').value),
 		    nodesections = ['JUNCTIONS', 'RESERVOIRS', 'TANKS'],
 		    linksections = ['PIPES', 'VALVES', 'PUMPS'];
-	    svgRemoveAll(svg);
+	    svg.removeAll(el);
 	    if ('object' != typeof model.COORDINATES)
 		return;
 	    var coords = d3.values(model.COORDINATES),
@@ -238,9 +239,9 @@ var epanetjs = function() {
 		    nodeSize = height / 75,
 		    strokeWidth = height / 200;
 
-	    svg.attr('viewBox', (minx - scale) + ' ' + 0 + ' ' + (width + 2 * scale) + ' ' + (height + 2 * scale));
+	    el.attr('viewBox', (minx - scale) + ' ' + 0 + ' ' + (width + 2 * scale) + ' ' + (height + 2 * scale));
 
-	    svg.append('circle')
+	    el.append('circle')
 		    .attr('cx', minx + width / 2)
 		    .attr('cy', top - height / 2)
 		    .attr('r', nodeSize)
@@ -253,34 +254,35 @@ var epanetjs = function() {
 		    nodeSize = nodeSize / r.height * 10;
 		}
 	    }
-	    svgRemoveAll(svg);
+	    svg.removeAll(el);
 
 	    // Render nodes
 	    for (var coordinate in model.COORDINATES)
 	    {
-		var c = model.COORDINATES[coordinate];
+		var c = model.COORDINATES[coordinate],
+		    color = svg.colormap[coordinate] || 'white';
 		if (model.RESERVOIRS[coordinate]) {
-		    svg.append('rect')
+		    el.append('rect')
 			    .attr('width', nodeSize * 2)
 			    .attr('height', nodeSize * 2)
 			    .attr('x', c.x - nodeSize)
 			    .attr('y', top - c.y - nodeSize)
-			    .attr('style', 'fill:white;');
+			    .attr('style', 'fill:' + color + ';');
 		} else if (model.TANKS[coordinate]) {
-		    svg.append('polygon')
+		    el.append('polygon')
 			    .attr('points', (c.x - nodeSize) + ' ' + (top - c.y - nodeSize) + ' ' +
 			    (c.x + nodeSize) + ' ' + (top - c.y - nodeSize) + ' ' +
 			    c.x + ' ' + (top - c.y + nodeSize))
-			    .attr('style', 'fill:white;');
+			    .attr('style', 'fill:' + color + ';');
 		} else {
-		    svg.append('circle')
+		    el.append('circle')
 			    .attr('cx', c.x)
 			    .attr('cy', top - c.y)
 			    .attr('r', nodeSize)
 			    .attr('title', coordinate)
-			    .attr('onmouseover', 'svgTooltip(evt.target)')
-			    .attr('onmouseout', 'svgClearTooltips(evt.target)')
-			    .attr('style', 'fill: white;');
+			    .attr('onmouseover', 'svg.tooltip(evt.target)')
+			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')
+			    .attr('style', 'fill:' + color + ';');
 		}
 	    }
 
@@ -308,7 +310,7 @@ var epanetjs = function() {
 				    d = d + ' L ' + p.x + ' ' + (top - p.y);
 				}
 				d = d + ' L ' + c2.x + ' ' + (top - c2.y);
-				svg.append('path')
+				el.append('path')
 					.attr('stroke', 'white')
 					.attr('fill', 'none')
 					.attr('d', d)
@@ -317,7 +319,7 @@ var epanetjs = function() {
 			    }
 			    else
 			    {
-				svg.append('line')
+				el.append('line')
 					.attr('x1', c1.x)
 					.attr('y1', top - c1.y)
 					.attr('x2', c2.x)
@@ -327,12 +329,12 @@ var epanetjs = function() {
 			    }
 
 			    if ('PUMPS' == s) {
-				svg.append('circle')
+				el.append('circle')
 					.attr('cx', centerx)
 					.attr('cy', top - centery)
 					.attr('r', nodeSize)
 					.attr('style', 'fill:white;');
-				svg.append('rect')
+				el.append('rect')
 					.attr('width', nodeSize * 1.5)
 					.attr('height', nodeSize)
 					.attr('x', centerx)
@@ -340,13 +342,13 @@ var epanetjs = function() {
 					.attr('transform', transform)
 					.attr('style', 'fill:white;');
 			    } else if ('VALVES' == s) {
-				svg.append('polygon')
+				el.append('polygon')
 					.attr('points', (centerx + nodeSize) + ' ' + (top - centery - nodeSize) + ' ' +
 					centerx + ' ' + (top - centery) + ' ' +
 					(centerx + nodeSize) + ' ' + (top - centery + nodeSize))
 					.attr('transform', transform)
 					.attr('style', 'fill:white;');
-				svg.append('polygon')
+				el.append('polygon')
 					.attr('points', (centerx - nodeSize) + ' ' + (top - centery - nodeSize) + ' ' +
 					centerx + ' ' + (top - centery) + ' ' +
 					(centerx - nodeSize) + ' ' + (top - centery + nodeSize))
@@ -361,7 +363,7 @@ var epanetjs = function() {
 	    for (var label in model['LABELS']) {
 		var l = model['LABELS'][label],
 			t = l['label'];
-		svg.append('text')
+		el.append('text')
 			.attr('x', l['x'] - nodeSize * t.length / 3)
 			.attr('y', top - l['y'] + nodeSize * 2)
 			.text(t)
@@ -378,9 +380,20 @@ var epanetjs = function() {
 	renderLegend = renderLegend || false;
 	if(!epanetjs.success)
 	    epanetjs.renderInput();
+	else {
+	    var colormap = {},
+		    nodes = epanetjs.results[1]['NODES'];	    
+	    for(var id in nodes) {
+		colormap[id] = 'red';
+	    }
+	    svg = epanetjs.svg(colormap);
+	    svg.render();
+	}
     };
     
     epanetjs.renderInput = function () {
+	svg = epanetjs.svg();
+	svg.render();
     };
     
     epanetjs.loadSample = function (f) {
@@ -399,8 +412,8 @@ var epanetjs = function() {
 	}
     };
     
-    epanetjs.readBin = function () {
-	var results = d3.epanetresult().parse('/report.bin');
+    epanetjs.readBin = function (success) {
+	epanetjs.results = (success ? d3.epanetresult().parse('/report.bin') : false);
     };
     
     epanetjs.render = function () {
@@ -410,12 +423,9 @@ var epanetjs = function() {
 	    epanetjs.renderAnalysis(epanetjs.ANALYSIS_WITH_LEGEND == epanetjs.mode);
     };
     
-    epanetjs.success = false;
-    
     epanetjs.setSuccess = function (success) {
 	epanetjs.success = success;
-	if(success)
-	    epanetjs.readBin();
+	epanetjs.readBin(success);
 	
 	epanetjs.render();	
     };
