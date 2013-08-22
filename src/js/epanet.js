@@ -337,7 +337,7 @@ function rendersvg() {
         .attr('x', l['x']-nodeSize*t.length/3)
         .attr('y', top-l['y']+nodeSize*2)
         .text(t)
-        .attr('style', 'font-family: Verdana, Arial, sans; font-size:'+(nodeSize*2))
+        .attr('style', 'font-family: Verdana, Arial, sans; font-size:'+(nodeSize*2)+'px;')
         .attr('fill', 'white');
     }
       
@@ -357,4 +357,23 @@ function loadSample(f) {
     } catch (e) {
         $('#working').modal('hide');
     }
+}
+
+function renderInput() {
+    $('analysisContainer').fadeOut('slow');
+    $('#inputContainer').fadeOut('slow', function () {
+	$(this).remove().insertBefore('#analysisContainer').fadeIn('slow');
+	$('#analysisContainer').fadeIn('slow');
+	$("[data-toggle=popover]").popover();
+    });
+}
+
+function renderAnalysis(renderLegend) {
+    renderLegend = renderLegend || false;
+    $('inputContainer').fadeOut('slow');
+    $('#analysisContainer').fadeOut('slow', function () {
+	$(this).remove().insertBefore('#inputContainer').fadeIn('slow');
+	$('#inputContainer').fadeIn('slow');
+	$("[data-toggle=popover]").popover();
+    });
 }
