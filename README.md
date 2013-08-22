@@ -3,12 +3,24 @@ epanet.js
 
 JavaScript version of EPANET.
 No installation required. Data is not send to the server.
-Demo available on [epanet.de/developer/epanetjs.html](http://epanet.de/developer/epanetjs.html)
+
+Demo: [epanet.de/js](http://epanet.de/js/)
+
+Detailed information: [epanet.de/developer/epanetjs.html](http://epanet.de/developer/epanetjs.html)
 
 Requirements
 ============
 
 [Emscripten](http://emscripten.org)'s emcc c-to-js compiler.
+
+Compilation
+===========
+
+Autotools can be used to build epanet.js. Starting from the tarball, use the
+following commands to build js.html:
+
+    ./configure
+    make
 
 TODO
 ====
