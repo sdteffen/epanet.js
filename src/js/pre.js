@@ -12,27 +12,27 @@ var preRun = function() {
     FS.ignorePermissions = true;
     try
     {
-        var inp = document.getElementById('inputTextarea').value;
-        $('#inputModal').modal('hide');
-        $('#inputPre').html(escapeInp(inp));
-        FS.createDataFile('/', 'input.inp', inp, true, true);
+	var inp = document.getElementById('inputTextarea').value;
+	$('#inputModal').modal('hide');
+	$('#inputPre').html(escapeInp(inp));
+	FS.createDataFile('/', 'input.inp', inp, true, true);
     } catch (e) {
-        console.log('/input.inp creation failed');
+	console.log('/input.inp creation failed');
     }
-    rendersvg();
 },
-        postRun = function() {
+	postRun = function() {
     var t = Module.intArrayToString(FS.findObject('/report.txt').contents),
-        s = $('#status'),
-        m = s.html(),
-        l = (0 > m.indexOf('error') ? '<span class="label label-success">Success</span>' 
-            : '<span class="label label-important">Error</span>');
+	    s = $('#status'),
+	    m = s.html(),
+	    success = 0 > m.indexOf('error'), 
+	    l = (success ? '<span class="label label-success">Success</span>'
+	    : '<span class="label label-important">Error</span>');
     s.html(l + m.replace(/^[ \n]*\.\.\. */, ' '));    
     $('#output').html(escapeInp(t));
-    readBin();
+    epanetjs.setSuccess(success);
     $('#working').modal('hide');
 },
-        Module = {
+	Module = {
     arguments: ['/input.inp', '/report.txt', '/report.bin'],
     preRun: preRun,
     postRun: postRun
@@ -43,8 +43,8 @@ runButton = function() {
     Module.run();
 }
 
-saveButton = function () {
+saveButton = function() {
     var inp = $('#inputTextarea').val(),
-        blob = new Blob([inp], {type: 'text/plain;charset=utf-8'});
+	    blob = new Blob([inp], {type: 'text/plain;charset=utf-8'});
     saveAs(blob, 'epanet.js.inp');
 }

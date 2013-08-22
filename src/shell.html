@@ -6,7 +6,7 @@
     <!-- See ../COPYING for licensing details -->
     <title>epanet.js</title>
     <link rel="canonical" href="http://epanet.de/js/" />
-    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="js/d3.v3.min.js"></script>
     <script type="text/javascript" src="js/epanet.js"></script>
     
      <!-- Bootstrap header -->
@@ -231,22 +231,22 @@ wall reactions are included.
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">View <b class="caret"></b></a>
                         <ul class="dropdown-menu">                                                
-                            <li><a href="javascript:renderInput()">Input</a></li>
-                            <li><a href="javascript:renderAnalysis(false)">Analysis</a></li>
-                            <li><a href="javascript:renderAnalysis(true)">Analysis with legend</a></li>                     
+                            <li><a href="javascript:epanetjs.setMode(epanetjs.INPUT)">Input</a></li>
+                            <li><a href="javascript:epanetjs.setMode(epanetjs.ANALYSIS)">Analysis</a></li>
+                            <li><a href="javascript:epanetjs.setMode(epanetjs.ANALYSIS_WITH_LEGEND)">Analysis with legend</a></li>                     
                         </ul>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Samples <b class="caret"></b></a>
                         <ul class="dropdown-menu">                    
                             <li class="dropdown-header">EPANET</li>
-                            <li><a href="javascript:loadSample('Net1.inp')">Net1.inp</a></li>
-                            <li><a href="javascript:loadSample('Net2.inp')">Net2.inp</a></li>
-                            <li><a href="javascript:loadSample('Net3.inp')">Net3.inp</a></li>
+                            <li><a href="javascript:epanetjs.loadSample('Net1.inp')">Net1.inp</a></li>
+                            <li><a href="javascript:epanetjs.loadSample('Net2.inp')">Net2.inp</a></li>
+                            <li><a href="javascript:epanetjs.loadSample('Net3.inp')">Net3.inp</a></li>
                             <li class="divider"></li>
                             <li class="dropdown-header">epanet.js</li>
-                            <li><a href="javascript:loadSample('simple.inp')">simple.inp</a></li>
-                            <li><a href="javascript:loadSample('PRV.inp')">PRV.inp</a></li>
+                            <li><a href="javascript:epanetjs.loadSample('simple.inp')">simple.inp</a></li>
+                            <li><a href="javascript:epanetjs.loadSample('PRV.inp')">PRV.inp</a></li>
                         </ul>
                     </li>                    
                     <li><a href="http://epanet.de/developer/epanetjs.html" data-toggle="tooltip" title="Documentation, source code and background information">Documentation</a></li>
