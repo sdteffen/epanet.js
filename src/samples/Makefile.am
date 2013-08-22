@@ -1,0 +1,1 @@
+EXTRA_DIST = Net1.inp Net2.inp Net3.inp PRV.inp simple.inp

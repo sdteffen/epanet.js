@@ -1,0 +1,3 @@
+EXTRA_DIST = README.md glyphicons-halflings-regular.eot \
+	glyphicons-halflings-regular.svg glyphicons-halflings-regular.ttf \
+	glyphicons-halflings-regular.woff

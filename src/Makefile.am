@@ -7,6 +7,10 @@ epanet_headers = enumstxt.h epanet2.h funcs.h hash.h mempool.h text.h \
 
 d3epanet_js = js/pre.js js/library.js shell.html
 
+EXTRA_DIST = $(epanet_sources) $(epanet_headers) shell.html
+
+SUBDIRS = css fonts js samples
+
 all: js.html
 	
 js.html: $(epanet_sources) $(epanet_headers) $(d3epanet_js)

@@ -1,0 +1,5 @@
+AUTOMAKE_OPTIONS = foreign
+
+EXTRA_DIST = AUTHORS.Emscripten COPYING.Bootstrap README.md
+
+SUBDIRS = src
