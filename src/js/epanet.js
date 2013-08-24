@@ -34,6 +34,15 @@ d3.inp = function() {
 		    section[key] = {NODE1: m[1], NODE2: m[2], PARAMETERS: m[3]};
 		}
 	    },
+	    TIMES: function(section, key, line) {
+		var m = line.match(/(CLOCKTIME|START|TIMESTEP)\s+([^\s].*[^\s])\s*/i);
+		if(m && m.length && 3 == m.length) {
+		    section[key+' '+m[1]] = m[2];
+		}
+		else {
+		    section[key] = line.replace(/^\s+/, '').replace(/\s+$/, '');
+		}
+	    },
 	    VALVES: function(section, key, line) {
 		var m = line.match(/\s*([^\s;]+)\s+([^\s;]+)\s+([0-9\.]+)\s+([^\s;]+)\s+([^\s;]+)\s+([0-9\.]+).*/);
 		if (m && m.length && 7 == m.length) {
@@ -76,6 +85,17 @@ d3.inp = function() {
 	});
 	return model;
     };
+    
+    inp.parseTime = function(t) {
+//	   if (!getfloat(Tok[n],&y))
+//   {
+//      if ( (y = hour(Tok[n],"")) < 0.0)
+//      {
+//         if ( (y = hour(Tok[n-1],Tok[n])) < 0.0) return(213);
+//      }
+//   }
+//   t = (long)(3600.0*y);
+    };
 
     return inp;
 };
@@ -88,7 +108,14 @@ d3.epanetresult = function() {
 
     epanetresult.i4 = Module._malloc(4);
     epanetresult.string = Module._malloc(255);
-
+    
+    epanetresult.hour = function(time, units) {
+	var t = Module._malloc(255),
+	    u = Module._malloc(255),
+	    hour = Module.cwrap('_hour', 'double', ['string', 'string']);
+	return hour(time, units);
+    }
+    
     epanetresult.parse = function(filename) {
 	var c = FS.findObject(filename).contents,
 		r = {},
@@ -422,11 +449,28 @@ var epanetjs = function() {
     };
     
     epanetjs.setSuccess = function (success) {
+	var time = d3.select('#time');
 	epanetjs.success = success;
 	epanetjs.readBin(success);
-	
+	time.selectAll('option').remove();
+	if(epanetjs.results) {
+		for(var t in epanetjs.results) {
+		    time.append('option')
+			.attr('value', t)
+			.text(epanetjs.clocktime(t));
+		}
+		
+	}
 	epanetjs.render();	
     };
+    
+    epanetjs.clocktime = function (seconds) {
+	 var h = Math.floor(seconds/3600),
+	     m = Math.floor((seconds % 3600) / 60),
+	     s = Math.floor(seconds - 3600*h - 60*m),
+	     fmt = d3.format('02d');
+	     return '' + h + ':' + fmt(m) + ':' + fmt(s);    
+    }
 
     return epanetjs;
 };

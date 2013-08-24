@@ -808,7 +808,7 @@ int  gettokens(char *s)
 }                        /* End of gettokens */
 
 
-double  hour(char *time, char *units)
+double hour(char *time, char *units)
 /*
 **---------------------------------------------------------
 **  Input:   *time  = string containing a time value
