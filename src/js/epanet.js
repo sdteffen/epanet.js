@@ -112,7 +112,7 @@ d3.epanetresult = function() {
     epanetresult.hour = function(time, units) {
 	var t = Module._malloc(255),
 	    u = Module._malloc(255),
-	    hour = Module.cwrap('_hour', 'double', ['string', 'string']);
+	    hour = Module.cwrap('hour', 'double', ['string', 'string']);
 	return hour(time, units);
     }
     
