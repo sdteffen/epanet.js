@@ -152,6 +152,7 @@ var epanetjs = function() {
     epanetjs.mode = epanetjs.INPUT;
     epanetjs.success = false;
     epanetjs.results = false;
+    epanetjs.color = false;
     
     epanetjs.setMode = function (mode) {
 	epanetjs.mode = mode;
@@ -174,13 +175,11 @@ var epanetjs = function() {
 	epanetjs.render();
     };
 
-    epanetjs.svg = function(colormap) {
+    epanetjs.svg = function() {
 	var svg = function() {};
-
-	svg.colormap = colormap || false;
+	
 	svg.width = window.innerWidth || document.documentElement.clientWidth || d.getElementsByTagName('body')[0].clientWidth;
 	svg.height = 500;
-	svg.colors = d3.scale.category10();
 	svg.nodemap = {};
 	svg.lastNodeId = 0;
 	svg.links = [];
@@ -219,6 +218,7 @@ var epanetjs = function() {
 		    nodesections = ['JUNCTIONS', 'RESERVOIRS', 'TANKS'],
 		    linksections = ['PIPES', 'VALVES', 'PUMPS'];
 	    svg.removeAll(el);
+	    el.attr('class', 'RdYlGn');
 	    if ('object' != typeof model.COORDINATES)
 		return;
 	    var coords = d3.values(model.COORDINATES),
@@ -255,36 +255,6 @@ var epanetjs = function() {
 		}
 	    }
 	    svg.removeAll(el);
-
-	    // Render nodes
-	    for (var coordinate in model.COORDINATES)
-	    {
-		var c = model.COORDINATES[coordinate],
-		    color = svg.colormap[coordinate] || 'white';
-		if (model.RESERVOIRS[coordinate]) {
-		    el.append('rect')
-			    .attr('width', nodeSize * 2)
-			    .attr('height', nodeSize * 2)
-			    .attr('x', c.x - nodeSize)
-			    .attr('y', top - c.y - nodeSize)
-			    .attr('style', 'fill:' + color + ';');
-		} else if (model.TANKS[coordinate]) {
-		    el.append('polygon')
-			    .attr('points', (c.x - nodeSize) + ' ' + (top - c.y - nodeSize) + ' ' +
-			    (c.x + nodeSize) + ' ' + (top - c.y - nodeSize) + ' ' +
-			    c.x + ' ' + (top - c.y + nodeSize))
-			    .attr('style', 'fill:' + color + ';');
-		} else {
-		    el.append('circle')
-			    .attr('cx', c.x)
-			    .attr('cy', top - c.y)
-			    .attr('r', nodeSize)
-			    .attr('title', coordinate)
-			    .attr('onmouseover', 'svg.tooltip(evt.target)')
-			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')
-			    .attr('style', 'fill:' + color + ';');
-		}
-	    }
 
 	    // Render links
 	    for (var section in linksections) {
@@ -359,6 +329,36 @@ var epanetjs = function() {
 		    }
 		}
 	    }
+	     // Render nodes
+	    for (var coordinate in model.COORDINATES)
+	    {
+		var c = model.COORDINATES[coordinate],
+		    color = 'q' + ('function' == typeof epanetjs.color ? epanetjs.color(epanetjs.results[1]['NODES'][coordinate]['PRESSURE']) + '-11' : 'fw');
+		if (model.RESERVOIRS[coordinate]) {
+		    el.append('rect')
+			    .attr('width', nodeSize * 2)
+			    .attr('height', nodeSize * 2)
+			    .attr('x', c.x - nodeSize)
+			    .attr('y', top - c.y - nodeSize)
+			    .attr('style', 'fill:' + color + ';');
+		} else if (model.TANKS[coordinate]) {
+		    el.append('polygon')
+			    .attr('points', (c.x - nodeSize) + ' ' + (top - c.y - nodeSize) + ' ' +
+			    (c.x + nodeSize) + ' ' + (top - c.y - nodeSize) + ' ' +
+			    c.x + ' ' + (top - c.y + nodeSize))
+			    .attr('style', 'fill:' + color + ';');
+		} else {
+		    el.append('circle')
+			    .attr('cx', c.x)
+			    .attr('cy', top - c.y)
+			    .attr('r', nodeSize)
+			    .attr('title', coordinate)
+			    .attr('onmouseover', 'svg.tooltip(evt.target)')
+			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')			    
+			    .attr('class', color);
+		}
+	    }
+	    
 	    // Render labels
 	    for (var label in model['LABELS']) {
 		var l = model['LABELS'][label],
@@ -381,12 +381,10 @@ var epanetjs = function() {
 	if(!epanetjs.success)
 	    epanetjs.renderInput();
 	else {
-	    var colormap = {},
-		    nodes = epanetjs.results[1]['NODES'];	    
-	    for(var id in nodes) {
-		colormap[id] = 'red';
-	    }
-	    svg = epanetjs.svg(colormap);
+	    var nodes = epanetjs.results[1]['NODES'];
+	    epanetjs.color = d3.scale.quantile().range(d3.range(11)),
+	    epanetjs.color.domain(d3.values(nodes).map(function (n) {return n['PRESSURE']}));
+	    svg = epanetjs.svg();
 	    svg.render();
 	}
     };
