@@ -36,8 +36,8 @@ d3.inp = function() {
 	    },
 	    TIMES: function(section, key, line) {
 		var m = line.match(/(CLOCKTIME|START|TIMESTEP)\s+([^\s].*[^\s])\s*/i);
-		if(m && m.length && 3 == m.length) {
-		    section[(key+' '+m[1]).toUpperCase()] = m[2];
+		if (m && m.length && 3 == m.length) {
+		    section[(key + ' ' + m[1]).toUpperCase()] = m[2];
 		}
 		else {
 		    section[key.toUpperCase()] = line.replace(/^\s+/, '').replace(/\s+$/, '');
@@ -52,8 +52,8 @@ d3.inp = function() {
 		}
 	    },
 	    VERTICES: function(section, key, line) {
-		var m = line.match(/\s*([0-9\.]+)\s+([0-9\.]+)/)
-		v = section[key] || [];
+		var m = line.match(/\s*([0-9\.]+)\s+([0-9\.]+)/),
+		v = section[key] || [],
 		c = {};
 		if (m && m.length && 3 == m.length) {
 		    c.x = parseFloat(m[1]);
@@ -85,7 +85,7 @@ d3.inp = function() {
 	});
 	return model;
     };
-    
+
     return inp;
 };
 
@@ -97,7 +97,7 @@ d3.epanetresult = function() {
 
     epanetresult.i4 = Module._malloc(4);
     epanetresult.string = Module._malloc(255);
-        
+
     epanetresult.parse = function(filename) {
 	var c = FS.findObject(filename).contents,
 		r = {},
@@ -152,21 +152,22 @@ d3.epanetresult = function() {
 };
 
 var epanetjs = function() {
-    epanetjs = function () {};
-    
+    epanetjs = function() {
+    };
+
     epanetjs.INPUT = 1;
     epanetjs.ANALYSIS = 2;
     epanetjs.ANALYSIS_WITH_LEGEND = 3;
-    
+
     epanetjs.mode = epanetjs.INPUT;
     epanetjs.success = false;
     epanetjs.results = false;
     epanetjs.colors = {'NODES': false, 'LINKS': false};
     epanetjs.model = false;
     
-    epanetjs.setMode = function (mode) {
+    epanetjs.setMode = function(mode) {
 	epanetjs.mode = mode;
-	if(epanetjs.INPUT == mode) {	    
+	if (epanetjs.INPUT == mode) {
 	    $('analysisContainer').fadeOut('slow');
 	    $('#inputContainer').fadeOut('slow', function() {
 		$(this).remove().insertBefore('#analysisContainer').fadeIn('slow');
@@ -174,7 +175,7 @@ var epanetjs = function() {
 		$("[data-toggle=popover]").popover();
 	    });
 	}
-	else {	    
+	else {
 	    $('inputContainer').fadeOut('slow');
 	    $('#analysisContainer').fadeOut('slow', function() {
 		$(this).remove().insertBefore('#inputContainer').fadeIn('slow');
@@ -185,15 +186,18 @@ var epanetjs = function() {
 	epanetjs.render();
     };
 
+    // Render the map
     epanetjs.svg = function() {
-	var svg = function() {};
-	
+	var svg = function() {
+	};
+
 	svg.width = window.innerWidth || document.documentElement.clientWidth || d.getElementsByTagName('body')[0].clientWidth;
 	svg.height = 500;
 	svg.nodemap = {};
 	svg.lastNodeId = 0;
 	svg.links = [];
 	svg.nodes = [];
+	svg.nodeSize = 1;
 
 	svg.removeAll = function(el) {
 	    el.selectAll('line').remove();
@@ -206,14 +210,20 @@ var epanetjs = function() {
 	svg.tooltip = function(element) {
 	    var el = d3.select('#' + element.parentNode.id),
 		    a = element.attributes,
-		    r = parseFloat(a['r'].value);
+		    text = a['title'].value;
+	    if(epanetjs.INPUT != epanetjs.mode && epanetjs.success) {
+		var fmt = d3.format('0.3f'),
+			nodeResult = $('#nodeResult').val().toUpperCase(),
+			v = epanetjs.results[$('#time').val()]['NODES'][text][nodeResult];
+		text = fmt(v);
+	    }
 	    el.select('.svgtooltip').remove();
 	    el.append('text')
-		    .attr('x', parseFloat(a['cx'].value) + r)
-		    .attr('y', parseFloat(a['cy'].value) - r)
-		    .text(a['title'].value)
+		    .attr('x', parseFloat(a['data-x'].value) + svg.nodeSize)
+		    .attr('y', parseFloat(a['data-y'].value) - svg.nodeSize)
+		    .text(text)
 		    .attr('class', 'svgtooltip')
-		    .attr('style', 'font-family: Verdana, Arial, sans; font-size:' + (r * 2)+'pt;')
+		    .attr('style', 'font-family: Verdana, Arial, sans; font-size:' + (svg.nodeSize * 2) + 'pt;')
 		    .attr('fill', 'white');
 	};
 
@@ -226,7 +236,10 @@ var epanetjs = function() {
 	    var el = d3.select('#svgSimple'),
 		    model = epanetjs.model,
 		    nodesections = ['JUNCTIONS', 'RESERVOIRS', 'TANKS'],
-		    linksections = ['PIPES', 'VALVES', 'PUMPS'];
+		    linksections = ['PIPES', 'VALVES', 'PUMPS'],
+		    step = $('#time').val(),
+		    nodeResult = $('#nodeResult').val().toUpperCase(),
+		    linkResult = $('#linkResult').val().toUpperCase();
 	    svg.removeAll(el);
 	    el.attr('class', 'RdYlGn');
 	    if ('object' != typeof model.COORDINATES)
@@ -245,26 +258,27 @@ var epanetjs = function() {
 		    height = (maxy - miny),
 		    width = (maxx - minx),
 		    scale = width * 0.1,
-		    top = maxy + scale,
-		    nodeSize = height / 75,
+		    top = maxy + scale,		    
 		    strokeWidth = height / 200;
 
 	    el.attr('viewBox', (minx - scale) + ' ' + 0 + ' ' + (width + 2 * scale) + ' ' + (height + 2 * scale));
 
+	    svg.nodeSize = height / 75,
 	    el.append('circle')
 		    .attr('cx', minx + width / 2)
 		    .attr('cy', top - height / 2)
-		    .attr('r', nodeSize)
+		    .attr('r', svg.nodeSize)
 		    .attr('style', 'fill: black');
 	    var c = d3.select('circle');
 	    if (c && c[0] && c[0][0] && c[0][0].getBoundingClientRect)
 	    {
 		var r = c[0][0].getBoundingClientRect();
 		if (r && r.height && r.width) {
-		    nodeSize = nodeSize / r.height * 10;
+		    svg.nodeSize = svg.nodeSize / r.height * 10;
 		}
 	    }
 	    svg.removeAll(el);
+	    nodeSize = svg.nodeSize;
 
 	    // Render links
 	    for (var section in linksections) {
@@ -339,39 +353,50 @@ var epanetjs = function() {
 		    }
 		}
 	    }
-	     // Render nodes
+	    // Render nodes
 	    for (var coordinate in model.COORDINATES)
 	    {
-		var c = model.COORDINATES[coordinate],
-		    step = $('#time').val(),
-		    v = epanetjs.results[step]['NODES'][coordinate]['PRESSURE'],
-		    r = epanetjs.colors['NODES'],
-		    color = 'q' + ('function' == typeof r ? r(v) + '-11' : 'fw');
+		var c = model.COORDINATES[coordinate],			
+			v = epanetjs.results[step]['NODES'][coordinate][nodeResult],
+			r = epanetjs.colors['NODES'],
+			color = 'q' + ('function' == typeof r ? r(v) + '-11' : 'fw');
 		if (model.RESERVOIRS[coordinate]) {
 		    el.append('rect')
 			    .attr('width', nodeSize * 2)
 			    .attr('height', nodeSize * 2)
 			    .attr('x', c.x - nodeSize)
 			    .attr('y', top - c.y - nodeSize)
-			    .attr('style', 'fill:' + color + ';');
+			    .attr('data-x', c.x)
+			    .attr('data-y', top - c.y)
+			    .attr('title', coordinate)
+			    .attr('onmouseover', 'svg.tooltip(evt.target)')
+			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')
+			    .attr('class', color);
 		} else if (model.TANKS[coordinate]) {
 		    el.append('polygon')
 			    .attr('points', (c.x - nodeSize) + ' ' + (top - c.y - nodeSize) + ' ' +
 			    (c.x + nodeSize) + ' ' + (top - c.y - nodeSize) + ' ' +
 			    c.x + ' ' + (top - c.y + nodeSize))
-			    .attr('style', 'fill:' + color + ';');
+			    .attr('title', coordinate)
+			    .attr('data-x', c.x)
+			    .attr('data-y', top - c.y)
+			    .attr('onmouseover', 'svg.tooltip(evt.target)')
+			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')
+			    .attr('class', color);
 		} else {
 		    el.append('circle')
 			    .attr('cx', c.x)
 			    .attr('cy', top - c.y)
 			    .attr('r', nodeSize)
+			    .attr('data-x', c.x)
+			    .attr('data-y', top - c.y)
 			    .attr('title', coordinate)
 			    .attr('onmouseover', 'svg.tooltip(evt.target)')
-			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')			    
+			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')
 			    .attr('class', color);
 		}
 	    }
-	    
+
 	    // Render labels
 	    for (var label in model['LABELS']) {
 		var l = model['LABELS'][label],
@@ -388,38 +413,46 @@ var epanetjs = function() {
 
 	return svg;
     };
-    
-    epanetjs.toolkit = function () {
-	var toolkit = function () {};
-	
+
+    // Make toolkit functions accessible in JavaScript
+    epanetjs.toolkit = function() {
+	var toolkit = function() {
+	};
+
 	toolkit.hour = function(time, units) {
 	    // Function has to be exported by emcc
-	    var hour = Module.cwrap('hour', 'double', ['string', 'string']); 
+	    var hour = Module.cwrap('hour', 'double', ['string', 'string']);
 	    return hour(time, units);
 	}
 	return toolkit;
     };
     epanetjs.toolkit = epanetjs.toolkit();
-
+    
     epanetjs.renderAnalysis = function(renderLegend) {
-	renderLegend = renderLegend || false;
-	if(!epanetjs.success)
+	var renderLegend = renderLegend || false,
+		nodeResult = $('#nodeResult').val().toUpperCase();
+	
+	if (!epanetjs.success)
 	    epanetjs.renderInput();
 	else {
 	    var nodes = epanetjs.results[1]['NODES'];
+	    if (epanetjs.INPUT == epanetjs.mode)
+		epanetjs.mode = epanetjs.ANALYSIS;
 	    epanetjs.colors['NODES'] = d3.scale.quantile().range(d3.range(11)),
-	    epanetjs.colors['NODES'].domain(d3.values(nodes).map(function (n) {return n['PRESSURE']}));
+		    epanetjs.colors['NODES'].domain(d3.values(nodes).map(function(n) {
+		return n[nodeResult];
+	    }));
 	    svg = epanetjs.svg();
 	    svg.render();
 	}
     };
-    
-    epanetjs.renderInput = function () {
+
+    epanetjs.renderInput = function() {
 	svg = epanetjs.svg();
 	svg.render();
     };
-    
-    epanetjs.loadSample = function (f) {
+
+    epanetjs.loadSample = function(f) {
 	$('#working').modal('show');
 	try {
 	    d3.text('samples/' + f, false, function(error, response) {
@@ -434,59 +467,59 @@ var epanetjs = function() {
 	    $('#working').modal('hide');
 	}
     };
-    
-    epanetjs.readBin = function (success) {
+
+    epanetjs.readBin = function(success) {
 	epanetjs.results = (success ? d3.epanetresult().parse('/report.bin') : false);
     };
-    
-    epanetjs.render = function () {
-	if(epanetjs.INPUT == epanetjs.mode)
+
+    epanetjs.render = function() {
+	if (epanetjs.INPUT == epanetjs.mode)
 	    epanetjs.renderInput();
 	else
 	    epanetjs.renderAnalysis(epanetjs.ANALYSIS_WITH_LEGEND == epanetjs.mode);
     };
-    
-    epanetjs.setSuccess = function (success) {
+
+    epanetjs.setSuccess = function(success) {
 	var time = d3.select('#time');
 	epanetjs.success = success;
 	epanetjs.readBin(success);
 	time.selectAll('option').remove();
 	epanetjs.model = d3.inp().parse(document.getElementById('inputTextarea').value)
-	if(epanetjs.results) {
+	if (epanetjs.results) {
 	    var reportTime = epanetjs.parseTime(epanetjs.model['TIMES']['REPORT START']),
-		reportTimestep = epanetjs.parseTime(epanetjs.model['TIMES']['REPORT TIMESTEP']);
-	    for(var t in epanetjs.results) {
+		    reportTimestep = epanetjs.parseTime(epanetjs.model['TIMES']['REPORT TIMESTEP']);
+	    for (var t in epanetjs.results) {
 		time.append('option')
-		    .attr('value', t)
-		    .text(epanetjs.clocktime(reportTime));
-		    reportTime += reportTimestep;
-	    }		
+			.attr('value', t)
+			.text(epanetjs.clocktime(reportTime));
+		reportTime += reportTimestep;
+	    }
 	}
-	epanetjs.render();	
+	epanetjs.render();
     };
-    
+
     epanetjs.parseTime = function(text) {
 	var t = parseFloat(text);
-	if(!text.match(/^[0-9\.]+$/))
+	if (!text.match(/^[0-9\.]+$/))
 	{
-	   t = epanetjs.toolkit.hour(text, '');
-	   if(t < 0.0)
-	   {
-	      var m = line.match(/\s*([^\s]+)\s+([^\s]+)\s*/);
-		if(!m || !m.length || 3 != m.length || 
-			(t = epanetjs.toolkit.hour(m[1], m[2])) < 0.0) 
+	    t = epanetjs.toolkit.hour(text, '');
+	    if (t < 0.0)
+	    {
+		var m = line.match(/\s*([^\s]+)\s+([^\s]+)\s*/);
+		if (!m || !m.length || 3 != m.length ||
+			(t = epanetjs.toolkit.hour(m[1], m[2])) < 0.0)
 		    throw 'Input Error 213: illegal option value';
-	   }
+	    }
 	}
 	return 3600.0 * t;
     };
-    
-    epanetjs.clocktime = function (seconds) {
-	 var h = Math.floor(seconds/3600),
-	     m = Math.floor((seconds % 3600) / 60),
-	     s = Math.floor(seconds - 3600*h - 60*m),
-	     fmt = d3.format('02d');
-	     return '' + h + ':' + fmt(m) + ':' + fmt(s);    
+
+    epanetjs.clocktime = function(seconds) {
+	var h = Math.floor(seconds / 3600),
+		m = Math.floor((seconds % 3600) / 60),
+		s = Math.floor(seconds - 3600 * h - 60 * m),
+		fmt = d3.format('02d');
+	return '' + h + ':' + fmt(m) + ':' + fmt(s);
     }
 
     return epanetjs;
