@@ -113,28 +113,44 @@ d3.epanetresult = function() {
 		numDuration = er.readInt(c, 56),
 		numPeriods = (numDuration / numTimeStep) + 1,
 		offsetNodeIDs = 884,
-		offsetResults = offsetNodeIDs + (36 * count['NODES']) + (52 * count['LINKS']) +
+		offsetLinkIDs = offsetNodeIDs + (32 * count['NODES']),
+		offsetNodeResults = offsetNodeIDs + (36 * count['NODES']) + (52 * count['LINKS']) +
 		(8 * count['TANKS']) + (28 * count['PUMPS']) + 4,
+		offsetLinkResults = 16 * count['NODES'] + offsetNodeResults,
 		i,
-		j;
-
-	// Nodes
+		j;	
+	// Loop over periods
 	for (i = 0; i < numPeriods; i++) {
 	    r[i + 1] = {'NODES': {}, 'LINKS': {}};
+	    
+	    // Nodes
 	    for (j = 0; j < count['NODES']; j++) {
 		var id = Module.intArrayToString(Array.prototype.slice.call(c,
-			offsetNodeIDs + (j * 32), offsetNodeIDs + 32 + (j * 32))).replace(/[^a-z0-9_\.]/gi, '');
-		r[i + 1]['NODES'][id] = {};
+			offsetNodeIDs + (j * 32), offsetNodeIDs + 32 + (j * 32))).replace(/[^a-z0-9_\.]/gi, '');		
 		r[i + 1]['NODES'][id] = {
-		    'DEMAND': er.readFloat(c, offsetResults + (j * 4)),
-		    'HEAD': er.readFloat(c, offsetResults + ((count['NODES'] + j) * 4)),
-		    'PRESSURE': er.readFloat(c, offsetResults + ((2 * count['NODES'] + j) * 4)),
-		    'QUALITY': er.readFloat(c, offsetResults + ((3 * count['NODES'] + j) * 4))
+		    'DEMAND': er.readFloat(c, offsetNodeResults + (j * 4)),
+		    'HEAD': er.readFloat(c, offsetNodeResults + ((count['NODES'] + j) * 4)),
+		    'PRESSURE': er.readFloat(c, offsetNodeResults + ((2 * count['NODES'] + j) * 4)),
+		    'QUALITY': er.readFloat(c, offsetNodeResults + ((3 * count['NODES'] + j) * 4))
 		};
 
 	    }
-	    offsetResults += (16 * count['NODES'] + 32 * count['LINKS']);
+	    
+	    // Links
+	    for( j = 0; j < count['LINKS']; j++) {
+		var id = Module.intArrayToString(Array.prototype.slice.call(c,
+		offsetLinkIDs + (j*32), offsetLinkIDs + 32 + (j * 32))).replace(/[^a-z0-9_\.]/gi, '');
+		r[i + 1]['LINKS'][id] = {
+		    'FLOW': er.readFloat(c, offsetLinkResults + (j * 4)),
+		    'VELOCITY': er.readFloat(c, offsetLinkResults + ((count['LINKS'] + j) * 4)),
+		    'HEADLOSS': er.readFloat(c, offsetLinkResults + ((2 * count['LINKS'] + j) * 4))
+		};
+	    }
+	    
+	    offsetNodeResults += (16 * count['NODES'] + 32 * count['LINKS']);
+	    offsetLinkResults += (16 * count['NODES'] + 32 * count['LINKS']);
 	}
+	
 	return r;
     }
 
@@ -173,7 +189,7 @@ var epanetjs = function() {
 		$(this).remove().insertBefore('#analysisContainer').fadeIn('slow');
 		$('#analysisContainer').fadeIn('slow');
 		$("[data-toggle=popover]").popover();
-	    });
+	    });	    
 	}
 	else {
 	    $('inputContainer').fadeOut('slow');
@@ -182,7 +198,12 @@ var epanetjs = function() {
 		$('#inputContainer').fadeIn('slow');
 		$("[data-toggle=popover]").popover();
 	    });
+	    
 	}
+	if(epanetjs.ANALYSIS_WITH_LEGEND == mode)
+	    $('#legend').show()
+	else
+	    $('#legend').hide();
 	epanetjs.render();
     };
 
@@ -190,6 +211,16 @@ var epanetjs = function() {
     epanetjs.svg = function() {
 	var svg = function() {
 	};
+	
+	// ====================================================================
+	// This product includes color specifications and designs 
+	// developed by Cynthia Brewer (http://colorbrewer.org/).
+	// See ../../COPYING for licensing details.
+	// RdYlGn
+	svg.colors =  {'NODES': ["#d7191c","#fdae61","#ffffbf","#a6d96a","#1a9641"],
+	// RdBu
+	    'LINKS': ["#ca0020","#f4a582","#f7f7f7","#92c5de","#0571b0"]};
+	// ====================================================================
 
 	svg.width = window.innerWidth || document.documentElement.clientWidth || d.getElementsByTagName('body')[0].clientWidth;
 	svg.height = 500;
@@ -240,8 +271,7 @@ var epanetjs = function() {
 		    step = $('#time').val(),
 		    nodeResult = $('#nodeResult').val().toUpperCase(),
 		    linkResult = $('#linkResult').val().toUpperCase();
-	    svg.removeAll(el);
-	    el.attr('class', 'RdYlGn');
+	    svg.removeAll(el);	    
 	    if ('object' != typeof model.COORDINATES)
 		return;
 	    var coords = d3.values(model.COORDINATES),
@@ -289,7 +319,12 @@ var epanetjs = function() {
 				node1 = l.NODE1 || false,
 				node2 = l.NODE2 || false,
 				c1 = model.COORDINATES[node1] || false,
-				c2 = model.COORDINATES[node2] || false;
+				c2 = model.COORDINATES[node2] || false,
+				v = epanetjs.results[step]['LINKS'][link][linkResult],
+				r = epanetjs.colors['LINKS'],
+				linkColors = epanetjs.svg.colors['LINKS'],
+				color = (epanetjs.INPUT == epanetjs.mode ? 'white': linkColors[r(v)]);
+			
 			if (c1 && c2) {
 			    var centerx = (c1.x + c2.x) / 2,
 				    centery = (c1.y + c2.y) / 2,
@@ -305,7 +340,7 @@ var epanetjs = function() {
 				}
 				d = d + ' L ' + c2.x + ' ' + (top - c2.y);
 				el.append('path')
-					.attr('stroke', 'white')
+					.attr('stroke', color)
 					.attr('fill', 'none')
 					.attr('d', d)
 					.attr('stroke-width', strokeWidth);
@@ -318,7 +353,7 @@ var epanetjs = function() {
 					.attr('y1', top - c1.y)
 					.attr('x2', c2.x)
 					.attr('y2', top - c2.y)
-					.attr('stroke', 'white')
+					.attr('stroke', color)
 					.attr('stroke-width', strokeWidth);
 			    }
 
@@ -327,27 +362,27 @@ var epanetjs = function() {
 					.attr('cx', centerx)
 					.attr('cy', top - centery)
 					.attr('r', nodeSize)
-					.attr('style', 'fill:white;');
+					.attr('style', 'fill:'+color+';');
 				el.append('rect')
 					.attr('width', nodeSize * 1.5)
 					.attr('height', nodeSize)
 					.attr('x', centerx)
 					.attr('y', top - centery - nodeSize)
 					.attr('transform', transform)
-					.attr('style', 'fill:white;');
+					.attr('style', 'fill:'+color+';');
 			    } else if ('VALVES' == s) {
 				el.append('polygon')
 					.attr('points', (centerx + nodeSize) + ' ' + (top - centery - nodeSize) + ' ' +
 					centerx + ' ' + (top - centery) + ' ' +
 					(centerx + nodeSize) + ' ' + (top - centery + nodeSize))
 					.attr('transform', transform)
-					.attr('style', 'fill:white;');
+					.attr('style', 'fill:'+color+';');
 				el.append('polygon')
 					.attr('points', (centerx - nodeSize) + ' ' + (top - centery - nodeSize) + ' ' +
 					centerx + ' ' + (top - centery) + ' ' +
 					(centerx - nodeSize) + ' ' + (top - centery + nodeSize))
 					.attr('transform', transform)
-					.attr('style', 'fill:white;');
+					.attr('style', 'fill:'+color+';');
 			    }
 			}
 		    }
@@ -359,7 +394,8 @@ var epanetjs = function() {
 		var c = model.COORDINATES[coordinate],			
 			v = epanetjs.results[step]['NODES'][coordinate][nodeResult],
 			r = epanetjs.colors['NODES'],
-			color = 'q' + ('function' == typeof r ? r(v) + '-11' : 'fw');
+			nodeColors = epanetjs.svg.colors['NODES'],
+			color = (epanetjs.INPUT == epanetjs.mode ? 'white': nodeColors[r(v)]);
 		if (model.RESERVOIRS[coordinate]) {
 		    el.append('rect')
 			    .attr('width', nodeSize * 2)
@@ -371,7 +407,7 @@ var epanetjs = function() {
 			    .attr('title', coordinate)
 			    .attr('onmouseover', 'svg.tooltip(evt.target)')
 			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')
-			    .attr('class', color);
+			    .attr('fill', color);
 		} else if (model.TANKS[coordinate]) {
 		    el.append('polygon')
 			    .attr('points', (c.x - nodeSize) + ' ' + (top - c.y - nodeSize) + ' ' +
@@ -382,7 +418,7 @@ var epanetjs = function() {
 			    .attr('data-y', top - c.y)
 			    .attr('onmouseover', 'svg.tooltip(evt.target)')
 			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')
-			    .attr('class', color);
+			    .attr('fill', color);
 		} else {
 		    el.append('circle')
 			    .attr('cx', c.x)
@@ -393,7 +429,7 @@ var epanetjs = function() {
 			    .attr('title', coordinate)
 			    .attr('onmouseover', 'svg.tooltip(evt.target)')
 			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')
-			    .attr('class', color);
+			    .attr('fill', color);
 		}
 	    }
 
@@ -413,6 +449,7 @@ var epanetjs = function() {
 
 	return svg;
     };
+    epanetjs.svg = epanetjs.svg();
 
     // Make toolkit functions accessible in JavaScript
     epanetjs.toolkit = function() {
@@ -429,27 +466,66 @@ var epanetjs = function() {
     epanetjs.toolkit = epanetjs.toolkit();
     
     epanetjs.renderAnalysis = function(renderLegend) {
-	var renderLegend = renderLegend || false,
-		nodeResult = $('#nodeResult').val().toUpperCase();
+	var renderLegend = renderLegend || false;
 	
 	if (!epanetjs.success)
 	    epanetjs.renderInput();
 	else {
-	    var nodes = epanetjs.results[1]['NODES'];
+	    var time = $('#time').val(),
+		nodes = epanetjs.results[time]['NODES'],
+		links = epanetjs.results[time]['LINKS'],		
+		nodeResult = $('#nodeResult').val().toUpperCase(),
+		linkResult = $('#linkResult').val().toUpperCase();
 	    if (epanetjs.INPUT == epanetjs.mode)
 		epanetjs.mode = epanetjs.ANALYSIS;
-	    epanetjs.colors['NODES'] = d3.scale.quantile().range(d3.range(11)),
-		    epanetjs.colors['NODES'].domain(d3.values(nodes).map(function(n) {
+	    epanetjs.colors['NODES'] = d3.scale.quantile().range(d3.range(5));
+	    epanetjs.colors['NODES'].domain(d3.values(nodes).map(function(n) {
 		return n[nodeResult];
 	    }));
-	    svg = epanetjs.svg();
+	    epanetjs.colors['LINKS'] = d3.scale.quantile().range(d3.range(5));
+	    epanetjs.colors['LINKS'].domain(d3.values(links).map(function(n) {
+		return n[linkResult];
+	    }));
+	    svg = epanetjs.svg;
 	    svg.render();
+	    d3.select('#legend ul').remove();
+	    if(renderLegend) {
+		var legend = d3.select('#legend'),
+			ul = legend.append('ul').attr('class', 'list-group'),
+			fmt = d3.format('0.3f'),
+			elements = ['Nodes', 'Links'];
+		for(var el in elements) {
+		    var	el = elements[el],
+			    singular = el.substr(0, el.length - 1)
+			    range = epanetjs.colors[el.toUpperCase()],			    
+			    quantiles = range.quantiles(),
+			    v = [fmt(d3.min(range.domain()))];
+		    ul.append('li').text(singular+' '+$('#'+singular.toLowerCase()+'Result').val()).attr('class', 'list-group-item active');
+		    for(var q in quantiles)
+		    {
+		       v[v.length] = fmt(quantiles[q]);
+		    }
+		    v[v.length] = fmt(d3.max(range.domain()));
+		    for(var i = 1; i < v.length; i++)
+		    {
+			var li = ul.append('li')			    
+				.attr('class', 'list-group-item'),
+			    value = (parseFloat(v[i-1]) + parseFloat(v[i]))/2;
+			li.append('span')
+				.attr('style', 'background:'+epanetjs.svg.colors[el.toUpperCase()][range(value)])
+				.attr('class', 'legendcolor')
+				.text(' ');
+			li.append('span')
+			    .text(' '+v[i-1]+' to '+v[i]);
+		    }
+		}
+		
+	    }		
 	}
     };
 
     epanetjs.renderInput = function() {
-	svg = epanetjs.svg();
-	svg.render();
+	epanetjs.svg.render();
     };
 
     epanetjs.loadSample = function(f) {

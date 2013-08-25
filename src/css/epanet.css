@@ -41,11 +41,6 @@ circle.node {
     cursor: pointer;
 }
 
-circle.node.reflexive {
-    stroke: #000 !important;
-    stroke-width: 2.5px;
-}
-
 text {
     font: 12px sans-serif;
     pointer-events: none;
@@ -57,13 +52,13 @@ text.id {
 }
 
 
-/* GLOBAL STYLES
--------------------------------------------------- */
-/* Padding below the footer and lighter body text */
-
 body {
     padding-bottom: 40px;
     color: #5a5a5a;    
+}
+
+h2 {
+    height: 36px;
 }
 
 .navbar {
@@ -76,6 +71,21 @@ body {
 
 .popover-content {
     font-size: 14px;
+}
+
+.well-sm {
+    height: 54px;
+    margin-bottom: 10px;
+}
+
+.well-analysis {
+    padding-top: 15px;
+}
+
+.legendcolor {
+    display: inline-block;
+    width: 20px;
+    height: 15px;
 }
 
 #status {
@@ -100,8 +110,7 @@ body {
 }
 
 #inputButtons {
-    width: 620px;
-    margin-bottom: 10px;
+    width: 620px;    
 }
 
 #file {
@@ -121,6 +130,13 @@ body {
     display: none;
 }
 
+#legend {
+    margin-top: -525px;
+    float: right;
+    width: 250px;
+    display: none;
+}
+
 /* RESPONSIVE CSS */
 
 @media (max-width: 979px) {
@@ -134,24 +150,3 @@ body {
     }
 
 }
-
-
-.RdYlGn .fw{fill:white}
-/* ============================================================================
-   This product includes color specifications and designs developed by 
-   Cynthia Brewer (http://colorbrewer.org/).
-   See ../COPYING for licensing details.
-*/
-.RdYlGn .q0-11{fill:rgb(165,0,38)}
-.RdYlGn .q1-11{fill:rgb(215,48,39)}
-.RdYlGn .q2-11{fill:rgb(244,109,67)}
-.RdYlGn .q3-11{fill:rgb(253,174,97)}
-.RdYlGn .q4-11{fill:rgb(254,224,139)}
-.RdYlGn .q5-11{fill:rgb(255,255,191)}
-.RdYlGn .q6-11{fill:rgb(217,239,139)}
-.RdYlGn .q7-11{fill:rgb(166,217,106)}
-.RdYlGn .q8-11{fill:rgb(102,189,99)}
-.RdYlGn .q9-11{fill:rgb(26,152,80)}
-.RdYlGn .q10-11{fill:rgb(0,104,55)}
-/* End of color specifications and designs developed by Cynthia Brewer 
-   ==========================================================================*/
