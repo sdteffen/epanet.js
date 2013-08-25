@@ -37,10 +37,10 @@ d3.inp = function() {
 	    TIMES: function(section, key, line) {
 		var m = line.match(/(CLOCKTIME|START|TIMESTEP)\s+([^\s].*[^\s])\s*/i);
 		if(m && m.length && 3 == m.length) {
-		    section[key+' '+m[1]] = m[2];
+		    section[(key+' '+m[1]).toUpperCase()] = m[2];
 		}
 		else {
-		    section[key] = line.replace(/^\s+/, '').replace(/\s+$/, '');
+		    section[key.toUpperCase()] = line.replace(/^\s+/, '').replace(/\s+$/, '');
 		}
 	    },
 	    VALVES: function(section, key, line) {
@@ -86,17 +86,6 @@ d3.inp = function() {
 	return model;
     };
     
-    inp.parseTime = function(t) {
-//	   if (!getfloat(Tok[n],&y))
-//   {
-//      if ( (y = hour(Tok[n],"")) < 0.0)
-//      {
-//         if ( (y = hour(Tok[n-1],Tok[n])) < 0.0) return(213);
-//      }
-//   }
-//   t = (long)(3600.0*y);
-    };
-
     return inp;
 };
 
@@ -108,14 +97,7 @@ d3.epanetresult = function() {
 
     epanetresult.i4 = Module._malloc(4);
     epanetresult.string = Module._malloc(255);
-    
-    epanetresult.hour = function(time, units) {
-	var t = Module._malloc(255),
-	    u = Module._malloc(255),
-	    hour = Module.cwrap('hour', 'double', ['string', 'string']);
-	return hour(time, units);
-    }
-    
+        
     epanetresult.parse = function(filename) {
 	var c = FS.findObject(filename).contents,
 		r = {},
@@ -179,7 +161,8 @@ var epanetjs = function() {
     epanetjs.mode = epanetjs.INPUT;
     epanetjs.success = false;
     epanetjs.results = false;
-    epanetjs.color = false;
+    epanetjs.colors = {'NODES': false, 'LINKS': false};
+    epanetjs.model = false;
     
     epanetjs.setMode = function (mode) {
 	epanetjs.mode = mode;
@@ -241,7 +224,7 @@ var epanetjs = function() {
 
 	svg.render = function() {
 	    var el = d3.select('#svgSimple'),
-		    model = d3.inp().parse(document.getElementById('inputTextarea').value),
+		    model = epanetjs.model,
 		    nodesections = ['JUNCTIONS', 'RESERVOIRS', 'TANKS'],
 		    linksections = ['PIPES', 'VALVES', 'PUMPS'];
 	    svg.removeAll(el);
@@ -360,7 +343,10 @@ var epanetjs = function() {
 	    for (var coordinate in model.COORDINATES)
 	    {
 		var c = model.COORDINATES[coordinate],
-		    color = 'q' + ('function' == typeof epanetjs.color ? epanetjs.color(epanetjs.results[1]['NODES'][coordinate]['PRESSURE']) + '-11' : 'fw');
+		    step = $('#time').val(),
+		    v = epanetjs.results[step]['NODES'][coordinate]['PRESSURE'],
+		    r = epanetjs.colors['NODES'],
+		    color = 'q' + ('function' == typeof r ? r(v) + '-11' : 'fw');
 		if (model.RESERVOIRS[coordinate]) {
 		    el.append('rect')
 			    .attr('width', nodeSize * 2)
@@ -402,6 +388,18 @@ var epanetjs = function() {
 
 	return svg;
     };
+    
+    epanetjs.toolkit = function () {
+	var toolkit = function () {};
+	
+	toolkit.hour = function(time, units) {
+	    // Function has to be exported by emcc
+	    var hour = Module.cwrap('hour', 'double', ['string', 'string']); 
+	    return hour(time, units);
+	}
+	return toolkit;
+    };
+    epanetjs.toolkit = epanetjs.toolkit();
 
     epanetjs.renderAnalysis = function(renderLegend) {
 	renderLegend = renderLegend || false;
@@ -409,8 +407,8 @@ var epanetjs = function() {
 	    epanetjs.renderInput();
 	else {
 	    var nodes = epanetjs.results[1]['NODES'];
-	    epanetjs.color = d3.scale.quantile().range(d3.range(11)),
-	    epanetjs.color.domain(d3.values(nodes).map(function (n) {return n['PRESSURE']}));
+	    epanetjs.colors['NODES'] = d3.scale.quantile().range(d3.range(11)),
+	    epanetjs.colors['NODES'].domain(d3.values(nodes).map(function (n) {return n['PRESSURE']}));
 	    svg = epanetjs.svg();
 	    svg.render();
 	}
@@ -453,15 +451,34 @@ var epanetjs = function() {
 	epanetjs.success = success;
 	epanetjs.readBin(success);
 	time.selectAll('option').remove();
+	epanetjs.model = d3.inp().parse(document.getElementById('inputTextarea').value)
 	if(epanetjs.results) {
-		for(var t in epanetjs.results) {
-		    time.append('option')
-			.attr('value', t)
-			.text(epanetjs.clocktime(t));
-		}
-		
+	    var reportTime = epanetjs.parseTime(epanetjs.model['TIMES']['REPORT START']),
+		reportTimestep = epanetjs.parseTime(epanetjs.model['TIMES']['REPORT TIMESTEP']);
+	    for(var t in epanetjs.results) {
+		time.append('option')
+		    .attr('value', t)
+		    .text(epanetjs.clocktime(reportTime));
+		    reportTime += reportTimestep;
+	    }		
 	}
 	epanetjs.render();	
+    };
+    
+    epanetjs.parseTime = function(text) {
+	var t = parseFloat(text);
+	if(!text.match(/^[0-9\.]+$/))
+	{
+	   t = epanetjs.toolkit.hour(text, '');
+	   if(t < 0.0)
+	   {
+	      var m = line.match(/\s*([^\s]+)\s+([^\s]+)\s*/);
+		if(!m || !m.length || 3 != m.length || 
+			(t = epanetjs.toolkit.hour(m[1], m[2])) < 0.0) 
+		    throw 'Input Error 213: illegal option value';
+	   }
+	}
+	return 3600.0 * t;
     };
     
     epanetjs.clocktime = function (seconds) {
