@@ -59,6 +59,7 @@ body {
 
 h2 {
     height: 36px;
+    margin-top: 0px;
 }
 
 .navbar {
@@ -96,6 +97,7 @@ h2 {
 #jumbotron {
     height: 500px;
     padding: 0px;
+    margin-bottom: 0px;
 }
 
 #inputPre, #output {
@@ -131,10 +133,16 @@ h2 {
 }
 
 #legend {
-    margin-top: -525px;
+    margin-top: -496px;
     float: right;
     width: 250px;
     display: none;
+}
+
+#ad {
+    text-align: center;
+    min-height: 5px;
+    margin-top: 1px;
 }
 
 /* RESPONSIVE CSS */

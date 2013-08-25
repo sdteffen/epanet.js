@@ -405,8 +405,8 @@ var epanetjs = function() {
 			    .attr('data-x', c.x)
 			    .attr('data-y', top - c.y)
 			    .attr('title', coordinate)
-			    .attr('onmouseover', 'svg.tooltip(evt.target)')
-			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')
+			    .attr('onmouseover', 'epanetjs.svg.tooltip(evt.target)')
+			    .attr('onmouseout', 'epanetjs.svg.clearTooltips(evt.target)')
 			    .attr('fill', color);
 		} else if (model.TANKS[coordinate]) {
 		    el.append('polygon')
@@ -416,8 +416,8 @@ var epanetjs = function() {
 			    .attr('title', coordinate)
 			    .attr('data-x', c.x)
 			    .attr('data-y', top - c.y)
-			    .attr('onmouseover', 'svg.tooltip(evt.target)')
-			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')
+			    .attr('onmouseover', 'epanetjs.svg.tooltip(evt.target)')
+			    .attr('onmouseout', 'epanetjs.svg.clearTooltips(evt.target)')
 			    .attr('fill', color);
 		} else {
 		    el.append('circle')
@@ -427,8 +427,8 @@ var epanetjs = function() {
 			    .attr('data-x', c.x)
 			    .attr('data-y', top - c.y)
 			    .attr('title', coordinate)
-			    .attr('onmouseover', 'svg.tooltip(evt.target)')
-			    .attr('onmouseout', 'svg.clearTooltips(evt.target)')
+			    .attr('onmouseover', 'epanetjs.svg.tooltip(evt.target)')
+			    .attr('onmouseout', 'epanetjs.svg.clearTooltips(evt.target)')
 			    .attr('fill', color);
 		}
 	    }
