@@ -167,6 +167,16 @@ d3.epanetresult = function() {
     return epanetresult;
 };
 
+var margin = {top: 1, right: 1, bottom: 6, left: 1},
+     width = 300 - margin.left - margin.right,
+	height = 500 - margin.top - margin.bottom;
+
+var formatNumber = d3.format(",.3f"),
+	format = function(d) {
+    return formatNumber(d);
+},
+	color = d3.scale.category20();
+
 var epanetjs = function() {
     epanetjs = function() {
     };
@@ -174,6 +184,10 @@ var epanetjs = function() {
     epanetjs.INPUT = 1;
     epanetjs.ANALYSIS = 2;
     epanetjs.ANALYSIS_WITH_LEGEND = 3;
+    epanetjs.ANALYSIS_SANKEY = 4;
+    
+    epanetjs.nodesections = ['JUNCTIONS', 'RESERVOIRS', 'TANKS'];
+    epanetjs.linksections = ['PIPES', 'VALVES', 'PUMPS'];
 
     epanetjs.mode = epanetjs.INPUT;
     epanetjs.success = false;
@@ -236,6 +250,7 @@ var epanetjs = function() {
 	    el.selectAll('rect').remove();
 	    el.selectAll('polygon').remove();
 	    el.selectAll('text').remove();
+	    el.selectAll('g').remove();
 	};
 
 	svg.tooltip = function(element) {
@@ -265,8 +280,7 @@ var epanetjs = function() {
 
 	svg.render = function() {
 	    var el = d3.select('#svgSimple'),
-		    model = epanetjs.model,
-		    nodesections = ['JUNCTIONS', 'RESERVOIRS', 'TANKS'],
+		    model = epanetjs.model,		
 		    linksections = ['PIPES', 'VALVES', 'PUMPS'],
 		    step = $('#time').val(),
 		    nodeResult = $('#nodeResult').val().toUpperCase(),
@@ -465,12 +479,14 @@ var epanetjs = function() {
     };
     epanetjs.toolkit = epanetjs.toolkit();
     
-    epanetjs.renderAnalysis = function(renderLegend) {
+    epanetjs.renderAnalysis = function(renderLegend) {	
 	var renderLegend = renderLegend || false;
 	
 	if (!epanetjs.success)
 	    epanetjs.renderInput();
 	else {
+	    if(epanetjs.ANALYSIS_SANKEY == epanetjs.mode)
+		return epanetjs.renderSankey();
 	    var time = $('#time').val(),
 		nodes = epanetjs.results[time]['NODES'],
 		links = epanetjs.results[time]['LINKS'],		
@@ -553,6 +569,134 @@ var epanetjs = function() {
 	    epanetjs.renderInput();
 	else
 	    epanetjs.renderAnalysis(epanetjs.ANALYSIS_WITH_LEGEND == epanetjs.mode);
+    };
+    
+    epanetjs.renderSankey = function () {
+	var svg = d3.select("#svgSimple");
+	width = $(document).width() - margin.left - margin.right;
+	svg.attr('viewBox', null);
+	epanetjs.svg.removeAll(svg);
+
+	var sankey = d3.sankey()
+		.nodeWidth(15)
+		.nodePadding(10)
+		.size([width, height]);
+
+	var path = sankey.link();
+
+	var model = epanetjs.model,
+	    nodes = [],
+	    nodemap = {},
+	    links = [],
+	    time = $('#time').val(),
+	    results = epanetjs.results[time]['LINKS'],				
+	    linkResult = $('#linkResult').val().toUpperCase();
+	
+	for (var section in epanetjs.nodesections) {
+		var s = epanetjs.nodesections[section];
+		if (model[s]) {
+		    for (var node in model[s]) {
+			var i = nodes.length
+			nodes[i] = {'name':node};
+			nodemap[node] = i;
+		    }
+		}
+	}
+	for (var section in epanetjs.linksections) {
+	    var s = epanetjs.linksections[section];
+	    if(model[s]) {
+		for(var id in model[s]) {
+		    var link = model[s][id],
+			    l = {};
+		    l.source = nodemap[link.NODE1];
+		    l.target = nodemap[link.NODE2];
+		    l.svalue = results[id][linkResult];
+		    l.value = Math.max(Math.abs(l.svalue), 0.000000000000000001);		    
+		    if(0 > results[id]['FLOW']) {			
+			l.source = nodemap[link.NODE2];
+			l.target = nodemap[link.NODE1];
+		    }
+		    if(('undefined' != typeof l.source) && ('undefined' != typeof l.target )&& ('undefined' != typeof l.value))
+			links[links.length] = l;
+		}
+	    }
+	}
+	    sankey
+		    .nodes(nodes)
+		    .links(links)
+		    .layout(32);
+
+	    var link = svg.append("g").selectAll(".link")
+		    .data(links)
+		    .enter().append("path")
+		    .attr("class", "sankeylink")
+		    .attr("d", path)
+		    .style("stroke-width", function(d) {
+		return Math.max(1, d.dy);
+	    })
+		    .sort(function(a, b) {
+		return b.dy - a.dy;
+	    });
+
+	    link.append("title")
+		    .text(function(d) {
+		return d.source.name + " → " + d.target.name + "\n" + format(d.svalue);
+	    });
+
+	    var node = svg.append("g").selectAll(".node")
+		    .data(nodes)
+		    .enter().append("g")
+		    .attr("class", "sankeynode")
+		    .attr("transform", function(d) {
+		return "translate(" + d.x + "," + d.y+ ")";
+	    })
+		    .call(d3.behavior.drag()
+		    .origin(function(d) {
+		return d;
+	    })
+		    .on("dragstart", function() {
+		this.parentNode.appendChild(this);
+	    })
+		    .on("drag", dragmove));
+
+	    node.append("rect")
+		    .attr("height", function(d) {
+		return d.dy;
+	    })
+		    .attr("width", sankey.nodeWidth())
+		    .style("fill", function(d) {
+		return d.color = color(d.name.replace(/ .*/, ""));
+	    })
+		    .style("stroke", function(d) {
+		return d3.rgb(d.color).darker(2);
+	    })
+		    .append("title")
+		    .text(function(d) {
+		return d.name + "\n" + format(d.value);
+	    });
+
+	    node.append("text")
+		    .attr("x", -6)
+		    .attr("y", function(d) {
+		return d.dy / 2;
+	    })
+		    .attr("dy", ".35em")
+		    .attr("text-anchor", "end")
+		    .attr("transform", null)
+		    .text(function(d) {
+		return d.name;
+	    })
+		    .filter(function(d) {
+		return d.x < width / 2;
+	    })
+		    .attr("x", 6 + sankey.nodeWidth())
+		    .attr("text-anchor", "start");
+
+	    function dragmove(d) {
+		d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
+		sankey.relayout();
+		link.attr("d", path);
+	    }
     };
 
     epanetjs.setSuccess = function(success) {

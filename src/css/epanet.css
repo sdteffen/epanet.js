@@ -89,6 +89,27 @@ h2 {
     height: 15px;
 }
 
+.sankeynode rect {
+  cursor: move;
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+}
+
+.sankeynode text {
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff;
+}
+
+.sankeylink {
+  fill: none;
+  stroke: white;
+  stroke-opacity: .2;
+}
+
+.sankeylink:hover {
+  stroke-opacity: .5;
+}
+
 #status {
     margin-bottom: 24px;
     text-align: left;

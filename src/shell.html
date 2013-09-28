@@ -233,7 +233,8 @@ wall reactions are included.
                         <ul class="dropdown-menu">                                                
                             <li><a href="javascript:epanetjs.setMode(epanetjs.INPUT)">Input</a></li>
                             <li><a href="javascript:epanetjs.setMode(epanetjs.ANALYSIS)">Analysis</a></li>
-                            <li><a href="javascript:epanetjs.setMode(epanetjs.ANALYSIS_WITH_LEGEND)">Analysis with legend</a></li>                     
+                            <li><a href="javascript:epanetjs.setMode(epanetjs.ANALYSIS_WITH_LEGEND)">Analysis with legend</a></li>
+			    <li><a href="javascript:epanetjs.setMode(epanetjs.ANALYSIS_SANKEY)">Sankey</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
@@ -290,17 +291,17 @@ wall reactions are included.
               <span id="status">
                   <span class="label label-success">Success</span>
               </span>
-	      | Time
+	      Time
               <select id="time" onchange="epanetjs.renderAnalysis()">
                   <option>1</option>
               </select>
-	      &nbsp;| Node
+	      &nbsp;Node
               <select id="nodeResult" onchange="epanetjs.renderAnalysis()">
 		  <option>Demand</option>
 		  <option>Head</option>
                   <option>Pressure</option>
               </select>
-	      &nbsp;| Link
+	      &nbsp;Link
               <select id="linkResult" onchange="epanetjs.renderAnalysis()">
                   <option>Flow</option>
 		  <option>Velocity</option>
