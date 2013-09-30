@@ -173,7 +173,9 @@ var margin = {top: 1, right: 1, bottom: 6, left: 1},
 
 var formatNumber = d3.format(",.3f"),
 	format = function(d) {
-    return formatNumber(d);
+    var units = epanetjs.model['OPTIONS']['Units'].replace(/\s*/g,'') || 'CMD',
+	    u = epanetjs.unit(units, $('#linkResult').val().toUpperCase());
+    return formatNumber(d)+' '+u;
 },
 	color = d3.scale.category20();
 
@@ -740,6 +742,70 @@ var epanetjs = function() {
 		s = Math.floor(seconds - 3600 * h - 60 * m),
 		fmt = d3.format('02d');
 	return '' + h + ':' + fmt(m) + ':' + fmt(s);
+    }
+    
+    epanetjs.unit = function(units, parameter) {
+	var u = '';
+	switch(parameter) {
+	    case 'FLOW':
+		switch(units)
+		{
+		    case 'LPS':
+			u = 'l/s'
+			break;
+		    case 'MLD':
+			u = 'ML/d';
+			break;
+		    case 'CMH':
+			u = 'm³/h';
+			break;
+		    case 'CMD':
+			u = 'm³/h';
+			break;
+		    case 'CFS':
+			u = 'cfs';
+			break;
+		    case 'GPM':
+			u = 'gpm';
+			break;
+		    case 'MGD':
+		       u = 'mgd';
+		       break;
+		    case 'IMGD':
+			u = 'Imgd';
+			break;
+		}
+		break;
+	    case 'VELOCITY':
+		switch(units)
+		{
+		   case 'LPS':
+		   case 'MLD':
+		   case 'CMH':
+		   case 'CMD':
+		       u = 'm/s';
+		       break;
+		   default:
+		       u = 'fps';
+		       break;
+		}
+		break;
+	   case 'HEADLOSS':
+	       switch(units)
+	       {
+		   case 'LPS':
+		   case 'MLD':
+		   case 'CMH':
+		   case 'CMD':
+		       u = '/ 1000m';
+		       break;
+		   default:
+		       u = '/ 1000ft';
+		       break;
+	       }
+	       break;
+	}
+	return u;
     }
 
     return epanetjs;
