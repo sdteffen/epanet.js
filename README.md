@@ -16,16 +16,18 @@ Requirements
 Compilation
 ===========
 
-Autotools can be used to build epanet.js. Starting from the tarball, use the
+A shell like Bash can be used to build epanet.js. Starting from the [tarball](http://epanet.de/developer/epanetjs.html#tarball), use the
 following commands to build js.html:
 
     ./configure
     make
 
+[Manual compilation instructions](http://epanet.de/developer/epanetjs.html#manual_build)
+
 TODO
 ====
 
-* Graphical interface
+* Interactive graphical interface
 
 Libraries
 =========
