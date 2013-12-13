@@ -11,4 +11,5 @@ configure
 install-sh
 missing
 src/js.html
+src/js.js
 src/js/d3.v3.js

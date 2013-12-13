@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([epanet.js], [2.0.12.2], [https://github.com/sdteffen/epanet.js/issues])
+AC_INIT([epanet.js], [2.0.12.3], [https://github.com/sdteffen/epanet.js/issues])
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME,AC_PACKAGE_VERSION)
 
 # Checks for programs.
