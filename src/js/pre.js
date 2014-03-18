@@ -31,6 +31,7 @@ var preRun = function() {
     $('#output').html(escapeInp(t));
     epanetjs.setSuccess(success);
     $('#working').modal('hide');
+    Module['calledRun'] = false;
 },
 	Module = {
     arguments: ['/input.inp', '/report.txt', '/report.bin'],
